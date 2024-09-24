@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/cgg-bern/blossom5-cmake
+	branch = main
+	commit = 83c73fbf6333f4ad2923dc47ebc5b25c98feefab
+	parent = 6f455dc40ad08df07e660a5d61133ff3ff4099a7
+	method = merge
+	cmdver = 0.4.6
