@@ -2,8 +2,7 @@
 
 build_quadwild:
     cmake . -B build -DWITH_GUROBI=0 -DSATSUMA_ENABLE_BLOSSOM5=1
-    cd build
-    make
+    cd build && make -j
 
 run_quadwild:
     cd Build/bin
