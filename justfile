@@ -1,5 +1,9 @@
 # Justfile for building and running quadwild on a Blender Monkey
 
+clean:
+    rm -rf build
+    rm -rf blender_monkey_*
+
 build_quadwild:
     cmake . -B build -DWITH_GUROBI=0 -DSATSUMA_ENABLE_BLOSSOM5=1
     cd build && make -j
