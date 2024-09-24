@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/cgg-bern/xfield_tracer_fork
+	branch = main
+	commit = 2913b67607a2515bdc8019c582939fb32affbaa0
+	parent = 780f3055e8339d513bd7aad652a532e9abef5fd0
+	method = merge
+	cmdver = 0.4.6
