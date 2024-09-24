@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/libigl/libigl.git
+	branch = main
+	commit = 0e02103df7b0f0303e055123de9489c56cae3978
+	parent = 0b77b895bd911c6446776288c76b4e4f0f83b62c
+	method = merge
+	cmdver = 0.4.6
