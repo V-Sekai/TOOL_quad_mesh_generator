@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://gitlab.vci.rwth-aachen.de:9000/CoMISo/Base.git
+	branch = master
+	commit = a8b7da577ed4b28696b8b9d5322d46c5469410aa
+	parent = 3d9c1fcf9b82da0bbf4da7cff0e6974236d9f861
+	method = merge
+	cmdver = 0.4.6
