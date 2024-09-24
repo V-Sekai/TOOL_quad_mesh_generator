@@ -5,8 +5,8 @@
 ;
 [subrepo]
 	remote = https://gitlab.com/libeigen/eigen.git
-	branch = master
-	commit = ba5183f98c13e104487efd73a8ad24158db66249
-	parent = 7908493e7e5f20898f270223195444e9a30e427f
+	branch = e7248b26a1ed53fa030c5c459f7ea095dfd276ac
+	commit = e7248b26a1ed53fa030c5c459f7ea095dfd276ac
+	parent = 6e8a95983b0c031a89863898a621107a25938ce6
 	method = merge
 	cmdver = 0.4.6
