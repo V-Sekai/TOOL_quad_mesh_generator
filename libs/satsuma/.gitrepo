@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/cgg-bern/libsatsuma
+	branch = main
+	commit = 1564df6bcbb1346524fc5b9d96e4ba2719556d49
+	parent = 5c047beb33a401b43286fda40d80a9cbab6eef9e
+	method = merge
+	cmdver = 0.4.6
