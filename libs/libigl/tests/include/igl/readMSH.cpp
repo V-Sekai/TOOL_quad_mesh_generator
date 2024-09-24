@@ -6,21 +6,21 @@
 
 #include <set>
 
-template <typename MatD, typename MatI, typename VecI>
-void test()
+
+TEST_CASE("readMSH","[igl]")
 {
-    MatD X;
-    MatI Tri;
-    MatI Tet;
-    VecI TriTag;
-    VecI TetTag;
+    Eigen::MatrixXd X;
+    Eigen::MatrixXi Tri;
+    Eigen::MatrixXi Tet;
+    Eigen::VectorXi TriTag;
+    Eigen::VectorXi TetTag;
 
     std::vector<std::string> XFields;
     std::vector<std::string> EFields;
 
-    std::vector<MatD> XF;
-    std::vector<MatD> TriF;
-    std::vector<MatD> TetF;
+    std::vector<Eigen::MatrixXd> XF;
+    std::vector<Eigen::MatrixXd> TriF;
+    std::vector<Eigen::MatrixXd> TetF;
 
     REQUIRE(igl::readMSH(test_common::data_path("sphere_lowres_TMS_1-0001_Magstim_70mm_Fig8_nii_scalar.msh"), 
         X, Tri, Tet, TriTag, TetTag, XFields, XF, EFields, TriF, TetF));
@@ -69,14 +69,4 @@ void test()
     REQUIRE(TetF[0].cols()==1);
     REQUIRE(TetF[0].rows()==25937);
 }
-
-TEST_CASE("readMSH","[igl]")
-{
-  test<Eigen::MatrixXd,Eigen::MatrixXi,Eigen::VectorXi>();
-  test<
-    Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>,
-    Eigen::Matrix<int,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>,
-    Eigen::VectorXi>();
-}
-
 

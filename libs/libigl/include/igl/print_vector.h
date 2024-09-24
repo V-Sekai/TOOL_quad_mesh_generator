@@ -12,7 +12,6 @@
 #include <vector>
 namespace igl 
 {
-  /// @private
   // Not clear what these are supposed to be doing. Currently they print
   // vectors to standard error...
   template <typename T>

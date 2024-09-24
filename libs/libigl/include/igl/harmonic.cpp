@@ -8,6 +8,7 @@
 #include "harmonic.h"
 #include "adjacency_matrix.h"
 #include "cotmatrix.h"
+#include "diag.h"
 #include "invert_diag.h"
 #include "isdiag.h"
 #include "massmatrix.h"
@@ -58,11 +59,12 @@ IGL_INLINE bool igl::harmonic(
   SparseMatrix<Scalar> A;
   adjacency_matrix(F,A);
   // sum each row
-  Eigen::Matrix<Scalar,Eigen::Dynamic,1> Asum;
-  igl::sum(A,1,Asum);
-  // Eigen 3.4 still struggles to do arithmetic with sparse and diagonal matrices
-  Eigen::SparseMatrix<Scalar> L = A - Eigen::SparseMatrix<Scalar>(Asum.asDiagonal());
-
+  SparseVector<Scalar> Asum;
+  sum(A,1,Asum);
+  // Convert row sums into diagonal of sparse matrix
+  SparseMatrix<Scalar> Adiag;
+  diag(Asum,Adiag);
+  SparseMatrix<Scalar> L = A-Adiag;
   SparseMatrix<Scalar> M;
   speye(L.rows(),M);
   return harmonic(L,M,b,bc,k,W);

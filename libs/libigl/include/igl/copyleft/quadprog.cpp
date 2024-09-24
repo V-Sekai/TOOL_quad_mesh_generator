@@ -97,21 +97,19 @@ IGL_INLINE bool igl::copyleft::quadprog(
   typedef double Scalar;
 
 
-#ifdef TRACE_SOLVER
-  const auto print_ivector= [](const char* name, const Eigen::MatrixXi & A, int /*n*/)
+  const auto print_ivector= [](const char* name, const Eigen::MatrixXi & A, int n)
   {
     std::cout<<igl::matlab_format(A,name)<<std::endl;
   };
-  const auto print_matrix = [](const char* name, const Eigen::MatrixXd & A, int /*n*/)
+  const auto print_matrix = [](const char* name, const Eigen::MatrixXd & A, int n)
   {
     std::cout<<igl::matlab_format(A,name)<<std::endl;
   };
 
-  const auto print_vector = [](const char* name, const Eigen::VectorXd & v, int /*n*/)
+  const auto print_vector = [](const char* name, const Eigen::VectorXd & v, int n)
   {
     std::cout<<igl::matlab_format(v,name)<<std::endl;
   };
-#endif
 
   const auto distance = [](Scalar a, Scalar b)->Scalar
   {
@@ -234,7 +232,7 @@ IGL_INLINE bool igl::copyleft::quadprog(
 #ifdef TRACE_SOLVER
     std::cerr << "Delete constraint " << l << ' ' << iq;
 #endif
-    int i, j, k, qq = -1;
+    int i, j, k, qq;
     double cc, ss, h, xny, t1, t2;
 
     /* Find the index qq for active constraint l to be removed */
@@ -314,19 +312,18 @@ IGL_INLINE bool igl::copyleft::quadprog(
  
   VectorXd s(m+p), z(n), r(m + p), d(n),  np(n), u(m + p);
   VectorXd x_old(n), u_old(m + p);
-#ifdef TRACE_SOLVER
-  double f_value;
-#endif
-  double psi, c1, c2, sum, ss, R_norm;
+  double f_value, psi, c1, c2, sum, ss, R_norm;
   const double inf = std::numeric_limits<double>::infinity();
   double t, t1, t2; /* t is the step length, which is the minimum of the partial step length t1 
     * and the full step length t2 */
   VectorXi A(m + p), A_old(m + p), iai(m + p);
-  int iq; 
+  int q;
+  int iq, iter = 0;
   std::vector<bool> iaexcl(m + p);
  	
   me = p; /* number of equality constraints */
   mi = m; /* number of inequality constraints */
+  q = 0;  /* size of the active set A (containing the indices of the active constraints) */
   
   /*
    * Preprocessing phase
@@ -362,8 +359,8 @@ IGL_INLINE bool igl::copyleft::quadprog(
   x = chol.solve(g0);
   x = -x;
 	/* and compute the current solution value */ 
-#ifdef TRACE_SOLVER
 	f_value = 0.5 * g0.dot(x);
+#ifdef TRACE_SOLVER
   std::cerr << "Unconstrained solution: " << f_value << std::endl;
   print_vector("x", x, n);
 #endif
@@ -396,9 +393,7 @@ IGL_INLINE bool igl::copyleft::quadprog(
     u.head(iq) -= t2 * r.head(iq);
     
     /* compute the new solution value */
-#ifdef TRACE_SOLVER
     f_value += 0.5 * (t2 * t2) * z.dot(np);
-#endif
     A(i) = -i - 1;
     
     if (!add_constraint(R, J, d, iq, R_norm))
@@ -413,7 +408,7 @@ IGL_INLINE bool igl::copyleft::quadprog(
 	for (i = 0; i < mi; i++)
 		iai(i) = i;
   
-l1:	
+l1:	iter++;
 #ifdef TRACE_SOLVER
   print_vector("x", x, n);
 #endif
@@ -443,6 +438,7 @@ l1:
 	if (std::abs(psi) <= mi * std::numeric_limits<double>::epsilon() * c1 * c2* 100.0)
 	{
     /* numerically there are not infeasibilities anymore */
+    q = iq;
 		return true;
   }
     
@@ -462,6 +458,7 @@ l2: /* Step 2: check for feasibility and determine a new S-pair */
 	}
   if (ss >= 0.0)
   {
+    q = iq;
     return true;
   }
     
@@ -525,6 +522,7 @@ l2a:/* Step 2a: determine step direction */
   {
     /* QPP is infeasible */
     // FIXME: unbounded to raise
+    q = iq;
     return false;
   }
   /* case (ii): step in dual space */
@@ -549,9 +547,7 @@ l2a:/* Step 2a: determine step direction */
   
   x += t * z;
   /* update the solution value */
-#ifdef TRACE_SOLVER
   f_value += t * z.dot(np) * (0.5 * t + u(iq));
-#endif
   
   u.head(iq) -= t * r.head(iq);
   u(iq) += t;

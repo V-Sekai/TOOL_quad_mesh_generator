@@ -44,7 +44,6 @@ IGL_INLINE igl::SolverStatus igl::active_set(
   Eigen::PlainObjectBase<DerivedZ> & Z
   )
 {
-
 //#define ACTIVE_SET_CPP_DEBUG
 #if defined(ACTIVE_SET_CPP_DEBUG) && !defined(_MSC_VER)
 #  warning "ACTIVE_SET_CPP_DEBUG"
@@ -111,6 +110,8 @@ IGL_INLINE igl::SolverStatus igl::active_set(
 
   // Keep track of previous Z for comparison
   DerivedZ old_Z;
+  old_Z = DerivedZ::Constant(
+      n,1,numeric_limits<typename DerivedZ::Scalar>::max());
 
   int iter = 0;
   while(true)
@@ -120,28 +121,22 @@ IGL_INLINE igl::SolverStatus igl::active_set(
     cout<<"  pre"<<endl;
 #endif
     // FIND BREACHES OF CONSTRAINTS
-#ifdef ACTIVE_SET_CPP_DEBUG
     int new_as_lx = 0;
     int new_as_ux = 0;
     int new_as_ieq = 0;
-#endif
     if(Z.size() > 0)
     {
       for(int z = 0;z < n;z++)
       {
         if(Z(z) < lx(z))
         {
-#ifdef ACTIVE_SET_CPP_DEBUG
           new_as_lx += (as_lx(z)?0:1);
-#endif
           //new_as_lx++;
           as_lx(z) = TRUE;
         }
         if(Z(z) > ux(z))
         {
-#ifdef ACTIVE_SET_CPP_DEBUG
           new_as_ux += (as_ux(z)?0:1);
-#endif
           //new_as_ux++;
           as_ux(z) = TRUE;
         }
@@ -154,9 +149,7 @@ IGL_INLINE igl::SolverStatus igl::active_set(
         {
           if(AieqZ(a) > Bieq(a))
           {
-#ifdef ACTIVE_SET_CPP_DEBUG
             new_as_ieq += (as_ieq(a)?0:1);
-#endif
             as_ieq(a) = TRUE;
           }
         }
@@ -165,17 +158,14 @@ IGL_INLINE igl::SolverStatus igl::active_set(
       cout<<"  new_as_lx: "<<new_as_lx<<endl;
       cout<<"  new_as_ux: "<<new_as_ux<<endl;
 #endif
-      if(iter > 0)
-      {
-        const double diff = (Z-old_Z).squaredNorm();
+      const double diff = (Z-old_Z).squaredNorm();
 #ifdef ACTIVE_SET_CPP_DEBUG
-        cout<<"diff: "<<diff<<endl;
+      cout<<"diff: "<<diff<<endl;
 #endif
-        if(diff < params.solution_diff_threshold)
-        {
-          ret = SOLVER_STATUS_CONVERGED;
-          break;
-        }
+      if(diff < params.solution_diff_threshold)
+      {
+        ret = SOLVER_STATUS_CONVERGED;
+        break;
       }
       old_Z = Z;
     }
@@ -200,7 +190,7 @@ IGL_INLINE igl::SolverStatus igl::active_set(
 #endif
 
     // PREPARE FIXED VALUES
-    Eigen::Matrix<typename Derivedknown::Scalar,Eigen::Dynamic,1> known_i;
+    Derivedknown known_i;
     known_i.resize(nk + as_lx_count + as_ux_count,1);
     DerivedY Y_i;
     Y_i.resize(nk + as_lx_count + as_ux_count,1);
@@ -280,7 +270,7 @@ IGL_INLINE igl::SolverStatus igl::active_set(
       cout<<"  everything's fixed."<<endl;
 #endif
       Z.resize(A.rows(),Y_i.cols());
-      Z(known_i,Eigen::all) = Y_i;
+      slice_into(Y_i,known_i,1,Z);
       sol.resize(0,Y_i.cols());
       assert(Aeq_i.rows() == 0 && "All fixed but linearly constrained");
     }else
@@ -290,15 +280,11 @@ IGL_INLINE igl::SolverStatus igl::active_set(
 #endif
       if(!min_quad_with_fixed_precompute(A,known_i,Aeq_i,params.Auu_pd,data))
       {
-#ifdef ACTIVE_SET_CPP_DEBUG
         cerr<<"Error: min_quad_with_fixed precomputation failed."<<endl;
-#endif
         if(iter > 0 && Aeq_i.rows() > Aeq.rows())
         {
-#ifdef ACTIVE_SET_CPP_DEBUG
           cerr<<"  *Are you sure rows of [Aeq;Aieq] are linearly independent?*"<<
             endl;
-#endif
         }
         ret = SOLVER_STATUS_ERROR;
         break;
@@ -308,9 +294,7 @@ IGL_INLINE igl::SolverStatus igl::active_set(
 #endif
       if(!min_quad_with_fixed_solve(data,B,Y_i,Beq_i,Z,sol))
       {
-#ifdef ACTIVE_SET_CPP_DEBUG
         cerr<<"Error: min_quad_with_fixed solve failed."<<endl;
-#endif
         ret = SOLVER_STATUS_ERROR;
         break;
       }
@@ -327,8 +311,8 @@ IGL_INLINE igl::SolverStatus igl::active_set(
     SparseMatrix<AT> Ak;
     // Slow
     slice(A,known_i,1,Ak);
-    //slice(B,known_i,Bk);
-    DerivedB Bk = B(known_i,Eigen::all);
+    DerivedB Bk;
+    slice(B,known_i,Bk);
     MatrixXd Lambda_known_i = -(0.5*Ak*Z + 0.5*Bk);
     // reverse the lambda values for lx
     Lambda_known_i.block(nk,0,as_lx_count,1) =

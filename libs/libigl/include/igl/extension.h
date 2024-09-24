@@ -13,12 +13,11 @@
 
 namespace igl
 {
-  ///  Extract file extension from path.
-  ///
-  ///  @param[in] path  path with an extension (path/to/foo.obj)
-  ///  @return extension without dot (obj)
-  ///
-  ///  \see pathinfo, basename, dirname
+  //  Inputs:
+  //    path  path with an extension (path/to/foo.obj)
+  //  Returns extension without dot (obj)
+  //
+  //  See also: pathinfo, basename, dirname
   IGL_INLINE std::string extension( const std::string & path);
 }
 

@@ -8,6 +8,6 @@
 Documentation, tutorial, and instructions at <https://libigl.github.io>.
 
 
-| 🆕 Doxygen Documentation |
+| 🚨 Important |
 |:---|
-| The latest version of libigl (v2.5.0) introduces [doxygen generated detailed documentation](https://libigl.github.io/dox/index.html) |
+| The latest version of libigl (v2.4.0) introduces some **breaking changes** to its CMake build system. Please read our [changelog](https://libigl.github.io/changelog/) page for instructions on how to update your project accordingly. |

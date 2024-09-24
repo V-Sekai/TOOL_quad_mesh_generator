@@ -11,10 +11,12 @@
 #include <Eigen/Dense>
 namespace igl
 {
-  /// Ceil a given matrix to nearest integers 
-  ///
-  /// @param[in] X  m by n matrix of scalars
-  /// @param[out] Y  m by n matrix of ceiled integers
+  // Ceil a given matrix to nearest integers 
+  //
+  // Inputs:
+  //   X  m by n matrix of scalars
+  // Outputs:
+  //   Y  m by n matrix of ceiled integers
   template < typename DerivedX, typename DerivedY>
   IGL_INLINE void ceil(
     const Eigen::PlainObjectBase<DerivedX>& X,

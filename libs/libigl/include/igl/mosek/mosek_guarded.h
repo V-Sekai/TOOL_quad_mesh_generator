@@ -14,10 +14,11 @@ namespace igl
 {
   namespace mosek
   {
-    /// Little function to wrap around mosek call to handle errors
-    /// 
-    /// @param[in] r  mosek error code returned from mosek call
-    /// @return r untouched
+    // Little function to wrap around mosek call to handle errors
+    // 
+    // Inputs:
+    //   r  mosek error code returned from mosek call
+    // Returns r untouched
     IGL_INLINE MSKrescodee mosek_guarded(const MSKrescodee r);
   }
 }

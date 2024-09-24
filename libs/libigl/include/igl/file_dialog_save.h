@@ -13,11 +13,13 @@
 
 namespace igl
 {
-  /// Open a file dialog to select a file
-  ///
-  /// @return string with a path to a new or existing file or empty if no file is selected
-  /// (on Linux machines, it assumes that Zenity is installed)
-  ///
+  // Returns a string with a path to a new/existing file
+  // The string is returned empty if no file is selected
+  // (on Linux machines, it assumes that Zenity is installed)
+  //
+  // Usage:
+  //   char buffer[FILE_DIALOG_MAX_BUFFER];
+  //   get_save_file_path(buffer);
   IGL_INLINE std::string file_dialog_save();
 }
 

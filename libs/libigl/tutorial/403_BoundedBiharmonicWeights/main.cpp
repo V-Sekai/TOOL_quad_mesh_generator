@@ -6,6 +6,7 @@
 #include <igl/jet.h>
 #include <igl/lbs_matrix.h>
 #include <igl/deform_skeleton.h>
+#include <igl/normalize_row_sums.h>
 #include <igl/readDMAT.h>
 #include <igl/readMESH.h>
 #include <igl/readTGF.h>
@@ -116,7 +117,7 @@ int main(int argc, char *argv[])
   VectorXi b;
   // List of boundary conditions of each weight function
   MatrixXd bc;
-  igl::boundary_conditions(V,T,C,VectorXi(),BE,MatrixXi(),MatrixXi(),b,bc);
+  igl::boundary_conditions(V,T,C,VectorXi(),BE,MatrixXi(),b,bc);
 
   // compute BBW weights matrix
   igl::BBWData bbw_data;
@@ -138,7 +139,7 @@ int main(int argc, char *argv[])
   //W.topLeftCorner(Wsurf.rows(),Wsurf.cols()) = Wsurf = Wsurf = Wsurf = Wsurf;
 
   // Normalize weights to sum to one
-  W  = (W.array().colwise() / W.array().rowwise().sum()).eval();
+  igl::normalize_row_sums(W,W);
   // precompute linear blend skinning matrix
   igl::lbs_matrix(V,W,M);
 

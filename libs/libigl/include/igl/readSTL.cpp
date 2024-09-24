@@ -8,14 +8,12 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 #include "readSTL.h"
-#include "IGL_ASSERT.h"
 #include "list_to_matrix.h"
 #include "string_utils.h"
 #include "read_file_binary.h"
 #include "FileMemoryStream.h"
 
 #include <iostream>
-#include <cstdint>
 
 namespace igl {
 
@@ -63,7 +61,7 @@ IGL_INLINE bool is_stl_binary(std::istream &input) {
   // Check if filesize matches the number of faces claimed.
   char buf[4];
   input.read(buf, 4);
-  size_t num_faces = *reinterpret_cast<std::uint32_t *>(buf);
+  size_t num_faces = *reinterpret_cast<uint32_t *>(buf);
   input.seekg(0, input.end);
   size_t file_size = input.tellg();
 
@@ -95,7 +93,7 @@ IGL_INLINE bool read_stl_ascii(std::istream &input,
   auto parse_ascii_normal = [&N](const char *line) {
     double x, y, z;
     size_t n = sscanf(line, " facet normal %lf %lf %lf", &x, &y, &z);
-    IGL_ASSERT(n == 3);
+    assert(n == 3);
     if (n != 3) {
       return false;
     }
@@ -108,7 +106,7 @@ IGL_INLINE bool read_stl_ascii(std::istream &input,
   auto parse_ascii_vertex = [&V](const char *line) {
     double x, y, z;
     size_t n = sscanf(line, " vertex %lf %lf %lf", &x, &y, &z);
-    IGL_ASSERT(n == 3);
+    assert(n == 3);
     if (n != 3) {
       return false;
     }
@@ -140,21 +138,21 @@ IGL_INLINE bool read_stl_ascii(std::istream &input,
         continue;
       if (starts_with(first_word, face_begin)) {
         success = parse_ascii_normal(line);
-        IGL_ASSERT(success);
+        assert(success);
         reading_facet = true;
       } else if (starts_with(first_word, face_end)) {
-        IGL_ASSERT(reading_facet);
+        assert(reading_facet);
         reading_facet = false;
       } else if (starts_with(first_word, loop_begin)) {
         reading_loop = true;
       } else if (starts_with(first_word, loop_end)) {
-        IGL_ASSERT(reading_loop);
+        assert(reading_loop);
         reading_loop = false;
       } else if (starts_with(first_word, vertex_flag)) {
-        IGL_ASSERT(reading_facet);
-        IGL_ASSERT(reading_loop);
+        assert(reading_facet);
+        assert(reading_loop);
         success = parse_ascii_vertex(line);
-        IGL_ASSERT(success);
+        assert(success);
         num_vts += 1;
       }
       if (!success) {
@@ -167,7 +165,7 @@ IGL_INLINE bool read_stl_ascii(std::istream &input,
     if (num_vts == 0) {
       return true;
     }
-    IGL_ASSERT(num_vts == 3);
+    assert(num_vts == 3);
     if (num_vts != 3) {
       std::cerr << "Warning: mesh contain face made of " << num_vts
                 << " vertices" << std::endl;
@@ -212,7 +210,7 @@ IGL_INLINE bool read_stl_binary(std::istream &input,
   }
 
   input.read(buf, 4);
-  const size_t num_faces = *reinterpret_cast<std::uint32_t *>(buf);
+  const size_t num_faces = *reinterpret_cast<uint32_t *>(buf);
   if (!input.good()) {
     throw std::runtime_error("Unable to parse STL number of faces.");
   }
@@ -224,7 +222,7 @@ IGL_INLINE bool read_stl_binary(std::istream &input,
     auto ny = static_cast<TypeN>(*reinterpret_cast<float *>(buf + FLOAT_SIZE));
     auto nz =
         static_cast<TypeN>(*reinterpret_cast<float *>(buf + FLOAT_SIZE * 2));
-    IGL_ASSERT(input.good());
+    assert(input.good());
 
     // vertex 1
     input.read(buf, FLOAT_SIZE * 3);
@@ -232,7 +230,7 @@ IGL_INLINE bool read_stl_binary(std::istream &input,
     auto v1y = static_cast<TypeV>(*reinterpret_cast<float *>(buf + FLOAT_SIZE));
     auto v1z =
         static_cast<TypeV>(*reinterpret_cast<float *>(buf + FLOAT_SIZE * 2));
-    IGL_ASSERT(input.good());
+    assert(input.good());
 
     // vertex 2
     input.read(buf, FLOAT_SIZE * 3);
@@ -240,7 +238,7 @@ IGL_INLINE bool read_stl_binary(std::istream &input,
     auto v2y = static_cast<TypeV>(*reinterpret_cast<float *>(buf + FLOAT_SIZE));
     auto v2z =
         static_cast<TypeV>(*reinterpret_cast<float *>(buf + FLOAT_SIZE * 2));
-    IGL_ASSERT(input.good());
+    assert(input.good());
 
     // vertex 3
     input.read(buf, FLOAT_SIZE * 3);
@@ -248,7 +246,7 @@ IGL_INLINE bool read_stl_binary(std::istream &input,
     auto v3y = static_cast<TypeV>(*reinterpret_cast<float *>(buf + FLOAT_SIZE));
     auto v3z =
         static_cast<TypeV>(*reinterpret_cast<float *>(buf + FLOAT_SIZE * 2));
-    IGL_ASSERT(input.good());
+    assert(input.good());
 
     // attribute (2 bytes), not sure what purpose they serve.
     input.read(buf, 2);
@@ -258,7 +256,7 @@ IGL_INLINE bool read_stl_binary(std::istream &input,
     V.push_back({{v2x, v2y, v2z}});
     V.push_back({{v3x, v3y, v3z}});
 
-    IGL_ASSERT(input.good());
+    assert(input.good());
     if (!input.good()) {
       std::stringstream err_msg;
       err_msg << "Failed to parse face " << i << " from STL file";
@@ -305,7 +303,7 @@ IGL_INLINE bool readSTL(
   Eigen::PlainObjectBase<DerivedF> & F,
   Eigen::PlainObjectBase<DerivedN> & N)
 {
-  std::vector<std::uint8_t> fileBufferBytes;
+  std::vector<uint8_t> fileBufferBytes;
   read_file_binary(fp,fileBufferBytes);
   FileMemoryStream stream((char*)fileBufferBytes.data(), fileBufferBytes.size());
   return readSTL(stream, V, F, N);

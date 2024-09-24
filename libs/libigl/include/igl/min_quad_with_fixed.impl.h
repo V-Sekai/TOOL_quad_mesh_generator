@@ -23,7 +23,7 @@
 #include <unsupported/Eigen/SparseExtra>
 #include <cassert>
 #include <cstdio>
-#include "matlab_format.h"
+#include <igl/matlab_format.h>
 #include <type_traits>
 
 template <typename T, typename Derivedknown>
@@ -120,16 +120,16 @@ IGL_INLINE bool igl::min_quad_with_fixed_precompute(
     // PD implies symmetric
     data.Auu_sym = true;
     // This is an annoying assertion unless EPS can be chosen in a nicer way.
-    //assert(is_symmetric(Auu,EPS<T>()));
+    //assert(is_symmetric(Auu,EPS<double>()));
     assert(is_symmetric(Auu,1.0) &&
       "Auu should be symmetric if positive definite");
   }else
   {
     // determine if A(unknown,unknown) is symmetric and/or positive definite
     VectorXi AuuI,AuuJ;
-    Matrix<T,Eigen::Dynamic,Eigen::Dynamic> AuuV;
+    MatrixXd AuuV;
     find(Auu,AuuI,AuuJ,AuuV);
-    data.Auu_sym = is_symmetric(Auu,EPS<T>()*AuuV.maxCoeff());
+    data.Auu_sym = is_symmetric(Auu,EPS<double>()*AuuV.maxCoeff());
   }
 
   // Determine number of linearly independent constraints
@@ -154,19 +154,13 @@ IGL_INLINE bool igl::min_quad_with_fixed_precompute(
       case Eigen::Success:
         break;
       case Eigen::NumericalIssue:
-#ifdef IGL_MIN_QUAD_WITH_FIXED_CPP_DEBUG
         cerr<<"Error: Numerical issue."<<endl;
-#endif
         return false;
       case Eigen::InvalidInput:
-#ifdef IGL_MIN_QUAD_WITH_FIXED_CPP_DEBUG
         cerr<<"Error: Invalid input."<<endl;
-#endif
         return false;
       default:
-#ifdef IGL_MIN_QUAD_WITH_FIXED_CPP_DEBUG
         cerr<<"Error: Other."<<endl;
-#endif
         return false;
     }
     nc = data.AeqTQR.rank();
@@ -231,45 +225,37 @@ IGL_INLINE bool igl::min_quad_with_fixed_precompute(
         case Eigen::Success:
           break;
         case Eigen::NumericalIssue:
-#ifdef IGL_MIN_QUAD_WITH_FIXED_CPP_DEBUG
           cerr<<"Error: Numerical issue."<<endl;
-#endif
           return false;
         default:
-#ifdef IGL_MIN_QUAD_WITH_FIXED_CPP_DEBUG
           cerr<<"Error: Other."<<endl;
-#endif
           return false;
       }
       data.solver_type = min_quad_with_fixed_data<T>::LLT;
     }else
     {
 #ifdef MIN_QUAD_WITH_FIXED_CPP_DEBUG
-        cout<<"    ldlt/lu"<<endl;
+    cout<<"    ldlt"<<endl;
 #endif
       // Either not PD or there are equality constraints
       SparseMatrix<T> NA;
       slice(new_A,data.unknown_lagrange,data.unknown_lagrange,NA);
       data.NA = NA;
-      if(data.Auu_pd)
+      // Ideally we'd use LDLT but Eigen doesn't support positive semi-definite
+      // matrices:
+      // http://forum.kde.org/viewtopic.php?f=74&t=106962&p=291990#p291990
+      if(data.Auu_sym && false)
       {
-#ifdef MIN_QUAD_WITH_FIXED_CPP_DEBUG
-        cout<<"    ldlt"<<endl;
-#endif
         data.ldlt.compute(NA);
         switch(data.ldlt.info())
         {
           case Eigen::Success:
             break;
           case Eigen::NumericalIssue:
-#ifdef MIN_QUAD_WITH_FIXED_CPP_DEBUG
             cerr<<"Error: Numerical issue."<<endl;
-#endif
             return false;
           default:
-#ifdef MIN_QUAD_WITH_FIXED_CPP_DEBUG
             cerr<<"Error: Other."<<endl;
-#endif
             return false;
         }
         data.solver_type = min_quad_with_fixed_data<T>::LDLT;
@@ -287,19 +273,13 @@ IGL_INLINE bool igl::min_quad_with_fixed_precompute(
           case Eigen::Success:
             break;
           case Eigen::NumericalIssue:
-#ifdef MIN_QUAD_WITH_FIXED_CPP_DEBUG
             cerr<<"Error: Numerical issue."<<endl;
             return false;
-#endif
           case Eigen::InvalidInput:
-#ifdef MIN_QUAD_WITH_FIXED_CPP_DEBUG
             cerr<<"Error: Invalid Input."<<endl;
-#endif
             return false;
           default:
-#ifdef MIN_QUAD_WITH_FIXED_CPP_DEBUG
             cerr<<"Error: Other."<<endl;
-#endif
             return false;
         }
         data.solver_type = min_quad_with_fixed_data<T>::LU;
@@ -376,14 +356,10 @@ IGL_INLINE bool igl::min_quad_with_fixed_precompute(
         case Eigen::Success:
           break;
         case Eigen::NumericalIssue:
-#ifdef MIN_QUAD_WITH_FIXED_CPP_DEBUG
           cerr<<"Error: Numerical issue."<<endl;
-#endif
           return false;
         default:
-#ifdef MIN_QUAD_WITH_FIXED_CPP_DEBUG
           cerr<<"Error: Other."<<endl;
-#endif
           return false;
       }
       data.solver_type = min_quad_with_fixed_data<T>::QR_LLT;
@@ -425,6 +401,7 @@ IGL_INLINE bool igl::min_quad_with_fixed_solve(
 {
   using namespace std;
   using namespace Eigen;
+  typedef Matrix<T,Dynamic,1> VectorXT;
   typedef Matrix<T,Dynamic,Dynamic> MatrixXT;
   // number of known rows
   int kr = data.known.size();
@@ -464,7 +441,8 @@ IGL_INLINE bool igl::min_quad_with_fixed_solve(
     }
 
     // Build right hand side
-    MatrixXT BBequlcols = BBeq(data.unknown_lagrange,Eigen::all);
+    MatrixXT BBequlcols;
+    igl::slice(BBeq,data.unknown_lagrange,1,BBequlcols);
     MatrixXT NB;
     if(kr == 0)
     {
@@ -489,9 +467,7 @@ IGL_INLINE bool igl::min_quad_with_fixed_solve(
         sol = data.lu.solve(NB);
         break;
       default:
-#ifdef MIN_QUAD_WITH_FIXED_CPP_DEBUG
         cerr<<"Error: invalid solver type"<<endl;
-#endif
         return false;
     }
     //std::cout<<"sol=["<<std::endl<<sol<<std::endl<<"];"<<std::endl;
@@ -515,7 +491,8 @@ IGL_INLINE bool igl::min_quad_with_fixed_solve(
       //data.AeqTQR.colsPermutation().transpose() * (-data.Aeqk * Y + Beq);
       data.AeqTET * (-data.Aeqk * Y + Beq.replicate(1,Beq.cols()==cols?1:cols));
     // Where did this -0.5 come from? Probably the same place as above.
-    MatrixXT Bu = B(data.unknown,Eigen::all);
+    MatrixXT Bu;
+    slice(B,data.unknown,1,Bu);
     MatrixXT NB;
     NB = -0.5*(Bu.replicate(1,B.cols()==cols?1:cols) + data.preY * Y);
     // Trim eff_Beq
@@ -669,7 +646,7 @@ IGL_INLINE Eigen::Matrix<Scalar,n,1> igl::min_quad_with_fixed(
     bcbc.head(dyn_n) =  bc;
     return bcbc;
   };
-  const Eigen::Matrix<Scalar,nn,1> bcbc = make_bcbc();
+  const Eigen::Matrix<double,nn,1> bcbc = make_bcbc();
   const Eigen::Matrix<Scalar,nn,1> xx =
     min_quad_with_fixed<Scalar,nn,false>(HH,ff,kk,bcbc);
   return xx.head(dyn_n);

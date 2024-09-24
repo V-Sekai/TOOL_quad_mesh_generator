@@ -3,7 +3,6 @@
 #include <set>
 #include <fstream>
 #include <iostream>
-#include <cstdint>
 #include <Eigen/Core>
 
 #include "tinyply.h"
@@ -40,17 +39,17 @@ IGL_INLINE bool tinyply_buffer_to_matrix(
   switch(D.t)
   {
     case tinyply::Type::INT8 :
-      return   _tinyply_buffer_to_matrix<std::int8_t,Derived>(D, M,rows,cols);
+      return   _tinyply_buffer_to_matrix<int8_t,Derived>(D, M,rows,cols);
     case tinyply::Type::UINT8 :
-      return   _tinyply_buffer_to_matrix<std::uint8_t,Derived>(D, M,rows,cols);
+      return   _tinyply_buffer_to_matrix<uint8_t,Derived>(D, M,rows,cols);
     case tinyply::Type::INT16 :
-      return   _tinyply_buffer_to_matrix<std::int16_t,Derived>(D, M,rows,cols);
+      return   _tinyply_buffer_to_matrix<int16_t,Derived>(D, M,rows,cols);
     case tinyply::Type::UINT16 :
-      return   _tinyply_buffer_to_matrix<std::uint16_t,Derived>(D, M,rows,cols);
+      return   _tinyply_buffer_to_matrix<uint16_t,Derived>(D, M,rows,cols);
     case tinyply::Type::INT32 :
-      return   _tinyply_buffer_to_matrix<std::int32_t,Derived>(D, M,rows,cols);
+      return   _tinyply_buffer_to_matrix<int32_t,Derived>(D, M,rows,cols);
     case tinyply::Type::UINT32 :
-      return   _tinyply_buffer_to_matrix<std::uint32_t,Derived>(D, M,rows,cols);
+      return   _tinyply_buffer_to_matrix<uint32_t,Derived>(D, M,rows,cols);
     case tinyply::Type::FLOAT32 :
       return   _tinyply_buffer_to_matrix<float,Derived>(D, M,rows,cols);
     case tinyply::Type::FLOAT64 :
@@ -120,17 +119,17 @@ IGL_INLINE bool tinyply_tristrips_to_faces(
   switch(D.t)
   {
     case tinyply::Type::INT8 :
-      return   _tinyply_tristrips_to_trifaces<std::int8_t,Derived>(D, M,el,el_len);
+      return   _tinyply_tristrips_to_trifaces<int8_t,Derived>(D, M,el,el_len);
     case tinyply::Type::UINT8 :
-      return   _tinyply_tristrips_to_trifaces<std::uint8_t,Derived>(D, M,el,el_len);
+      return   _tinyply_tristrips_to_trifaces<uint8_t,Derived>(D, M,el,el_len);
     case tinyply::Type::INT16 :
-      return   _tinyply_tristrips_to_trifaces<std::int16_t,Derived>(D, M,el,el_len);
+      return   _tinyply_tristrips_to_trifaces<int16_t,Derived>(D, M,el,el_len);
     case tinyply::Type::UINT16 :
-      return   _tinyply_tristrips_to_trifaces<std::uint16_t,Derived>(D, M,el,el_len);
+      return   _tinyply_tristrips_to_trifaces<uint16_t,Derived>(D, M,el,el_len);
     case tinyply::Type::INT32 :
-      return   _tinyply_tristrips_to_trifaces<std::int32_t,Derived>(D, M,el,el_len);
+      return   _tinyply_tristrips_to_trifaces<int32_t,Derived>(D, M,el,el_len);
     case tinyply::Type::UINT32 :
-      return   _tinyply_tristrips_to_trifaces<std::uint32_t,Derived>(D, M,el,el_len);
+      return   _tinyply_tristrips_to_trifaces<uint32_t,Derived>(D, M,el,el_len);
     case tinyply::Type::FLOAT32 :
       return   _tinyply_tristrips_to_trifaces<float,Derived>(D, M,el,el_len);
     case tinyply::Type::FLOAT64 :
@@ -171,7 +170,7 @@ IGL_INLINE bool readPLY(
   // then read from memory buffer
   try
   {
-    std::vector<std::uint8_t> fileBufferBytes;
+    std::vector<uint8_t> fileBufferBytes;
     // read_file_binary will call fclose
     read_file_binary(fp,fileBufferBytes);
     FileMemoryStream stream((char*)fileBufferBytes.data(), fileBufferBytes.size());
@@ -397,15 +396,15 @@ IGL_INLINE bool readPLY(
   file.read(ply_stream);
 
   if (!vertices || !tinyply_buffer_to_matrix(*vertices,V,vertices->count,3) ) {
-    // Don't do this because V might have non-trivial compile-time size V.resize(0,0);
+    V.resize(0,0);
   }
 
   if (!normals || !tinyply_buffer_to_matrix(*normals,N,normals->count,3) ) {
-    // Don't do this (see above) N.resize(0,0);
+    N.resize(0,0);
   }
 
   if (!texcoords || !tinyply_buffer_to_matrix(*texcoords,UV,texcoords->count,2) ) {
-    // Don't do this (see above) UV.resize(0,0);
+    UV.resize(0,0);
   }
 
   //HACK: Unfortunately, tinyply doesn't store list size as a separate variable
@@ -419,24 +418,22 @@ IGL_INLINE bool readPLY(
 
       // all strips should have tristrips->count elements
       if(!tinyply_tristrips_to_faces(*tristrips, F , tristrips->count, el_count))
-      {
-        // Don't do this (see above) F.resize(0,0);
-      }
+        F.resize(0,0);
 
     } else {
-      // Don't do this (see above) F.resize(0,0);
+      F.resize(0,0);
     }
   }
 
   if(!edges || !tinyply_buffer_to_matrix(*edges,E, edges->count,2)) {
-    // Don't do this (see above) E.resize(0,0);
+    E.resize(0,0);
   }
 
   /// convert vertex data:
   Vheader=_vertex_header;
   if(_vertex_header.empty())
   {
-    // Don't do this (see above) VD.resize(0,0);
+    VD.resize(0,0);
   }
   else
   {
@@ -448,7 +445,7 @@ IGL_INLINE bool readPLY(
   Fheader=_face_header;
   if(_face_header.empty())
   {
-    // Don't do this (see above) FD.resize(0,0);
+    FD.resize(0,0);
   }
   else
   {
@@ -460,7 +457,7 @@ IGL_INLINE bool readPLY(
   Eheader=_edge_header;
   if(_edge_header.empty())
   {
-    // Don't do this (see above) ED.resize(0,0);
+    ED.resize(0,0);
   }
   else
   {

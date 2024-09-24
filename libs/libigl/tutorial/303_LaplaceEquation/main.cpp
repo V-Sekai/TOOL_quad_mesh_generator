@@ -6,6 +6,7 @@
 #include <igl/readOFF.h>
 #include <igl/setdiff.h>
 #include <igl/slice.h>
+#include <igl/slice_into.h>
 #include <igl/unique.h>
 #include <igl/opengl/glfw/Viewer.h>
 #include <Eigen/Sparse>
@@ -37,13 +38,15 @@ int main(int argc, char *argv[])
   igl::slice(L,in,b,L_in_b);
 
   // Dirichlet boundary conditions from z-coordinate
+  VectorXd bc;
   VectorXd Z = V.col(2);
-  VectorXd bc = Z(b);
+  igl::slice(Z,b,bc);
 
   // Solve PDE
   SimplicialLLT<SparseMatrix<double > > solver(-L_in_in);
+  VectorXd Z_in = solver.solve(L_in_b*bc);
   // slice into solution
-  Z(in) = solver.solve(L_in_b*bc);
+  igl::slice_into(Z_in,in,Z);
 
   // Alternative, short hand
   igl::min_quad_with_fixed_data<double> mqwf;

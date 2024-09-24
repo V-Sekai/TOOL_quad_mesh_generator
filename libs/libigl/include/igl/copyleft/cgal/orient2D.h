@@ -17,14 +17,12 @@ namespace igl
   {
     namespace cgal
     {
-      /// Tests whether a point is above, on, or below a line.
-      ///
-      /// @param[in] pa 2D point on plane
-      /// @param[in] pb 2D point on plane
-      /// @param[in] pc 2D point to test
-      ///  @return 1 if pa,pb,pc,pd forms a triangle of positive area.
-      ///   0 if pa,pb,pc,pd are coplanar.
-      ///  -1 if pa,pb,pc,pd forms a tet of negative area.
+      // Inputs:
+      //   pa,pb,pc   2D points.
+      // Output:
+      //   1 if pa,pb,pc are counterclockwise oriented.
+      //   0 if pa,pb,pc are collinear.
+      //  -1 if pa,pb,pc are clockwise oriented.
       template <typename Scalar>
       IGL_INLINE short orient2D(
           const Scalar *pa,

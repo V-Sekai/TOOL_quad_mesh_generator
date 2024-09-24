@@ -14,22 +14,27 @@
 
 namespace igl
 {
-  /// Determine boundary facets of mesh elements stored in T
-  ///
-  /// @tparam IntegerT  integer-value: i.e. int
-  /// @tparam IntegerF  integer-value: i.e. int
-  /// @param[in] T  triangle|tetrahedron index list, m by 3|4, where m is the
-  ///   number of elements
-  /// @param[out] I  m long list of bools whether tet is on boundary
-  /// @param[out] C  m by 3|4 list of bools whether opposite facet is on
-  ///   boundary
-  ///
+  // ON_BOUNDARY Determine boundary facets of mesh elements stored in T
+  //
+  // Templates:
+  //   IntegerT  integer-value: i.e. int
+  //   IntegerF  integer-value: i.e. int
+  // Input:
+  //  T  triangle|tetrahedron index list, m by 3|4, where m is the number of
+  //    elements
+  // Output:
+  //  I  m long list of bools whether tet is on boundary
+  //  C  m by 3|4 list of bools whether opposite facet is on boundary
+  //
   template <typename IntegerT>
   IGL_INLINE void on_boundary(
     const std::vector<std::vector<IntegerT> > & T,
     std::vector<bool> & I,
     std::vector<std::vector<bool> > & C);
-  /// \overload
+  // Templates:
+  //   DerivedT  integer-value: i.e. from MatrixXi
+  //   DerivedI  bool-value: i.e. from MatrixXi
+  //   DerivedC  bool-value: i.e. from MatrixXi
   template <typename DerivedT, typename DerivedI, typename DerivedC>
   IGL_INLINE void on_boundary(
     const Eigen::MatrixBase<DerivedT>& T,

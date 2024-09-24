@@ -15,23 +15,25 @@
 
 namespace igl
 {
-  /// Act like the matlab X(row_indices,col_indices) operator, where row_indices,
-  /// col_indices are non-negative integer indices. This version is about 2x faster
-  /// than igl::slice, but it assumes that the indices to slice with are already sorted.
-  ///
-  /// @param[in] X  m by n matrix
-  /// @param[in] R  list of row indices
-  /// @param[in] C  list of column indices
-  /// @param[out] Y  #R by #C matrix
-  ///
-  /// \see slice
+  // Act like the matlab X(row_indices,col_indices) operator, where row_indices,
+  // col_indices are non-negative integer indices. This version is about 2x faster
+  // than igl::slice, but it assumes that the indices to slice with are already sorted.
+  //
+  // Inputs:
+  //   X  m by n matrix
+  //   R  list of row indices
+  //   C  list of column indices
+  //
+  // Output:
+  //   Y  #R by #C matrix
+  //
   template <typename TX, typename TY, typename DerivedR, typename DerivedC>
-  IGL_INLINE void slice_sorted(
-    const Eigen::SparseMatrix<TX> &X,
-    const Eigen::DenseBase<DerivedR> &R,
-    const Eigen::DenseBase<DerivedC> &C,
-    Eigen::SparseMatrix<TY> &Y);
-} 
+  IGL_INLINE void slice_sorted(const Eigen::SparseMatrix<TX> &X,
+                               const Eigen::DenseBase<DerivedR> &R,
+                               const Eigen::DenseBase<DerivedC> &C,
+                               Eigen::SparseMatrix<TY> &Y);
+
+}  // namespace igl
 
 #ifndef IGL_STATIC_LIBRARY
 #include "slice_sorted.cpp"

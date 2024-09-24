@@ -20,9 +20,10 @@ namespace igl
   {
     namespace cgal
     {
-      /// Class for defining and computing a constructive solid geometry result
-      /// out of a tree of boolean operations on "solid" triangle meshes.
-      ///
+      // Class for defining and computing a constructive solid geometry result
+      // out of a tree of boolean operations on "solid" triangle meshes.
+      //
+      //template <typename DerivedF>
       class CSGTree
       {
         public:
@@ -32,14 +33,12 @@ namespace igl
           typedef Eigen::Matrix<ExactScalar,Eigen::Dynamic,3> MatrixX3E;
           typedef Eigen::VectorXi VectorJ;
         private:
-          /// Resulting mesh vertex positions
+          // Resulting mesh
           MatrixX3E m_V;
-          /// Resulting mesh face indices into V
           POBF m_F;
-          /// Birth index of each face in resulting mesh. Birth index is the index
           VectorJ m_J;
-          /// Number of birth faces in A + those in B. I.e. sum of original "leaf"
-          /// faces involved in result.
+          // Number of birth faces in A + those in B. I.e. sum of original "leaf"
+          // faces involved in result.
           size_t m_number_of_birth_faces;
         public:
           CSGTree()
@@ -83,11 +82,12 @@ namespace igl
           {
             swap(*this,other);
           }
-          /// Construct and compute a boolean operation on existing CSGTree nodes.
-          ///
-          /// @param[in] A  Solid result of previous CSG operation (or identity, see below)
-          /// @param[in] B  Solid result of previous CSG operation (or identity, see below)
-          /// @param[in] type  type of mesh boolean to compute 
+          // Construct and compute a boolean operation on existing CSGTree nodes.
+          //
+          // Inputs:
+          //   A  Solid result of previous CSG operation (or identity, see below)
+          //   B  Solid result of previous CSG operation (or identity, see below)
+          //   type  type of mesh boolean to compute 
           CSGTree(
             const CSGTree & A,
             const CSGTree & B,
@@ -111,7 +111,7 @@ namespace igl
             m_number_of_birth_faces = 
               A.number_of_birth_faces() + B.number_of_birth_faces();
           }
-          /// \overload
+          // Overload using string for type
           CSGTree(
             const CSGTree & A,
             const CSGTree & B,
@@ -120,11 +120,12 @@ namespace igl
           {
             // do nothing (all done in constructor).
           }
-          /// "Leaf" node with identity operation on assumed "solid" mesh (V,F)
-          ///
-          /// @param[in] V  #V by 3 list of mesh vertices (in any precision, will be
-          ///     converted to exact)
-          /// @param[in] F  #F by 3 list of mesh face indices into V
+          // "Leaf" node with identity operation on assumed "solid" mesh (V,F)
+          //
+          // Inputs:
+          //   V  #V by 3 list of mesh vertices (in any precision, will be
+          //     converted to exact)
+          //   F  #F by 3 list of mesh face indices into V
           template <typename DerivedV>
           CSGTree(const Eigen::PlainObjectBase<DerivedV> & V, const POBF & F)//:
           // Possible Eigen bug:

@@ -19,11 +19,12 @@ namespace igl
 {
   namespace opengl
   {
-    /// Print last OpenGL error to stderr prefixed by specified id string
-    /// @param[in] id   string to appear before any error msgs
-    /// @return result of glGetError() 
+    // Print last OpenGL error to stderr prefixed by specified id string
+    // Inputs:
+    //   id   string to appear before any error msgs
+    // Returns result of glGetError() 
     IGL_INLINE GLenum report_gl_error(const std::string id);
-    /// \overload
+    // No prefix
     IGL_INLINE GLenum report_gl_error();
   }
 }

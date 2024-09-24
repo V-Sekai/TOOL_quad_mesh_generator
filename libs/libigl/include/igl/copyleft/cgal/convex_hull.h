@@ -16,11 +16,13 @@ namespace igl
   {
     namespace cgal
     {
-      /// Given a set of points (V), compute the convex hull as a triangle mesh (W,G)
-      /// 
-      /// @param[in] V  #V by 3 list of input points
-      /// @param[out] W  #W by 3 list of convex hull points
-      /// @param[out] G  #G by 3 list of triangle indices into W
+      // Given a set of points (V), compute the convex hull as a triangle mesh (W,G)
+      // 
+      // Inputs:
+      //   V  #V by 3 list of input points
+      // Outputs:
+      //   W  #W by 3 list of convex hull points
+      //   G  #G by 3 list of triangle indices into W
       template <
         typename DerivedV,
         typename DerivedW,
@@ -29,7 +31,14 @@ namespace igl
         const Eigen::MatrixBase<DerivedV> & V,
         Eigen::PlainObjectBase<DerivedW> & W,
         Eigen::PlainObjectBase<DerivedG> & G);
-      /// \overload
+      // Given a set of points (V), compute the convex hull as a triangle mesh (F)
+      // over input vertex set (V)
+      // 
+      // Inputs:
+      //   V  #V by 3 list of input points
+      // Outputs:
+      //   F  #F by 3 list of triangle indices into V
+      //
       template <
         typename DerivedV,
         typename DerivedF>

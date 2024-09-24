@@ -12,13 +12,15 @@
 #include <vector>
 namespace igl
 {
-  /// Determine if each edge in the mesh (V,F) is Delaunay.
-  ///
-  /// @param[in] l  #l by dim list of edge lengths
-  /// @param[in] F  #F by 3 list of triangles indices
-  /// @param[out] D  #F by 3 list of bools revealing whether edges corresponding 23 31 12
-  ///     are locally Delaunay. Boundary edges are by definition Delaunay.
-  ///     Non-Manifold edges are by definition not Delaunay.
+  // IS_INTRINSIC_DELAUNAY Determine if each edge in the mesh (V,F) is Delaunay.
+  //
+  // Inputs:
+  //   l  #l by dim list of edge lengths
+  //   F  #F by 3 list of triangles indices
+  // Outputs:
+  //   D  #F by 3 list of bools revealing whether edges corresponding 23 31 12
+  //     are locally Delaunay. Boundary edges are by definition Delaunay.
+  //     Non-Manifold edges are by definition not Delaunay.
   template <
     typename Derivedl,
     typename DerivedF,
@@ -27,8 +29,8 @@ namespace igl
     const Eigen::MatrixBase<Derivedl> & l,
     const Eigen::MatrixBase<DerivedF> & F,
     Eigen::PlainObjectBase<DerivedD> & D);
-  /// \overload
-  /// @param[in] uE2E  #uE list of lists mapping unique edges to (half-)edges
+  // Inputs:
+  //   uE2E  #uE list of lists mapping unique edges to (half-)edges
   template <
     typename Derivedl,
     typename DerivedF,
@@ -39,15 +41,16 @@ namespace igl
     const Eigen::MatrixBase<DerivedF> & F,
     const std::vector<std::vector<uE2EType> > & uE2E,
     Eigen::PlainObjectBase<DerivedD> & D);
-  /// Determine whether a single edge is Delaunay using a provided (extrinsic) incirle
-  /// test.
-  ///
-  /// @param[in] l  #l by dim list of edge lengths
-  /// @param[in] uE2E  #uE list of lists of indices into E of coexisting edges (see
-  ///              unique_edge_map)
-  /// @param[in] num_faces  number of faces (==#F)
-  /// @param[in] uei  index into uE2E of edge to check
-  /// @return true iff edge is Delaunay
+  // Determine whether a single edge is Delaunay using a provided (extrinsic) incirle
+  // test.
+  //
+  // Inputs:
+  //   l  #l by dim list of edge lengths
+  //   uE2E  #uE list of lists of indices into E of coexisting edges (see
+  //     unique_edge_map)
+  //   num_faces  number of faces (==#F)
+  //   uei  index into uE2E of edge to check
+  // Returns true iff edge is Delaunay
   template <
     typename Derivedl,
     typename uE2EType,

@@ -26,7 +26,6 @@ template <
   typename DerivedV>
 IGL_INLINE void igl::polar_dec(
   const Eigen::PlainObjectBase<DerivedA> & A,
-  const bool includeReflections,
   Eigen::PlainObjectBase<DerivedR> & R,
   Eigen::PlainObjectBase<DerivedT> & T,
   Eigen::PlainObjectBase<DerivedU> & U,
@@ -45,7 +44,7 @@ IGL_INLINE void igl::polar_dec(
   if(fetestexcept(FE_UNDERFLOW) || eig.eigenvalues()(0)/eig.eigenvalues()(2)<th)
   {
     cout<<"resorting to svd 1..."<<endl;
-    return polar_svd(A,includeReflections,R,T,U,S,V);
+    return polar_svd(A,R,T,U,S,V);
   }
 
   S = eig.eigenvalues().cwiseSqrt();
@@ -59,7 +58,7 @@ IGL_INLINE void igl::polar_dec(
   V = V.rowwise().reverse().eval();
   U = U.rowwise().reverse().eval() * S.asDiagonal().inverse();
 
-  if(!includeReflections && R.determinant() < 0)
+  if(R.determinant() < 0)
   {
     // Annoyingly the .eval() is necessary
     auto W = V.eval();
@@ -72,7 +71,7 @@ IGL_INLINE void igl::polar_dec(
   if(std::fabs(R.squaredNorm()-3.) > th)
   {
     cout<<"resorting to svd 2..."<<endl;
-    return polar_svd(A,includeReflections,R,T,U,S,V);
+    return polar_svd(A,R,T,U,S,V);
   }
 }
 
@@ -82,54 +81,17 @@ template <
   typename DerivedT>
 IGL_INLINE void igl::polar_dec(
   const Eigen::PlainObjectBase<DerivedA> & A,
-  const bool includeReflections,
   Eigen::PlainObjectBase<DerivedR> & R,
   Eigen::PlainObjectBase<DerivedT> & T)
 {
   DerivedA U;
   DerivedA V;
   Eigen::Matrix<typename DerivedA::Scalar,DerivedA::RowsAtCompileTime,1> S;
-  return igl::polar_dec(A,includeReflections,R,T,U,S,V);
-}
-
-
-template <
-  typename DerivedA,
-  typename DerivedR,
-  typename DerivedT,
-  typename DerivedU,
-  typename DerivedS,
-  typename DerivedV>
-IGL_INLINE void igl::polar_dec(
-  const Eigen::PlainObjectBase<DerivedA> & A,
-  Eigen::PlainObjectBase<DerivedR> & R,
-  Eigen::PlainObjectBase<DerivedT> & T,
-  Eigen::PlainObjectBase<DerivedU> & U,
-  Eigen::PlainObjectBase<DerivedS> & S,
-  Eigen::PlainObjectBase<DerivedV> & V)
-{
-  // do **not** include reflections (for backwards compatibility)
-  return igl::polar_dec(A,false,R,T,U,S,V);
-}
-
-template <
-  typename DerivedA,
-  typename DerivedR,
-  typename DerivedT>
-IGL_INLINE void igl::polar_dec(
-  const Eigen::PlainObjectBase<DerivedA> & A,
-  Eigen::PlainObjectBase<DerivedR> & R,
-  Eigen::PlainObjectBase<DerivedT> & T)
-{
-  // do **not** include reflections (for backwards compatibility)
-  return igl::polar_dec(A,false,R,T);
+  return igl::polar_dec(A,R,T,U,S,V);
 }
 
 #ifdef IGL_STATIC_LIBRARY
 // Explicit template instantiation
-template void igl::polar_dec<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, -1, 1, 0, -1, 1>, Eigen::Matrix<double, -1, -1, 0, -1, -1> >(Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&);
-template void igl::polar_dec<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, 3, 3, 0, 3, 3>, Eigen::Matrix<double, -1, -1, 0, -1, -1> >(Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, bool, Eigen::PlainObjectBase<Eigen::Matrix<double, 3, 3, 0, 3, 3> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&);
-template void igl::polar_dec<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, 3, 3, 0, 3, 3>, Eigen::Matrix<double, -1, -1, 0, -1, -1> >(Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, Eigen::PlainObjectBase<Eigen::Matrix<double, 3, 3, 0, 3, 3> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&);
-template void igl::polar_dec<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, 2, 2, 0, 2, 2>, Eigen::Matrix<double, -1, -1, 0, -1, -1> >(Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, bool, Eigen::PlainObjectBase<Eigen::Matrix<double, 2, 2, 0, 2, 2> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&);
+template  void igl::polar_dec<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, -1, 1, 0, -1, 1>, Eigen::Matrix<double, -1, -1, 0, -1, -1> >(Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, 1, 0, -1, 1> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&);
 template void igl::polar_dec<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<double, 2, 2, 0, 2, 2>, Eigen::Matrix<double, -1, -1, 0, -1, -1> >(Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, Eigen::PlainObjectBase<Eigen::Matrix<double, 2, 2, 0, 2, 2> >&, Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> >&);
 #endif

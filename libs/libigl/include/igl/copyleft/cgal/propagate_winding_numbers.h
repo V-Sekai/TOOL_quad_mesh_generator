@@ -25,25 +25,27 @@ namespace igl
   {
     namespace cgal
     {
-      /// Compute winding number on each side of the face.  The input mesh
-      /// could contain multiple connected components.  The input mesh must
-      /// represent the boundary of a valid 3D volume, which means it is
-      /// closed, consistently oriented and induces integer winding numbers.
-      ///
-      /// @param[in] V  #V by 3 list of vertex positions.
-      /// @param[in] F  #F by 3 list of triangle indices into V.
-      /// @param[in] labels  #F list of facet labels ranging from 0 to k-1.
-      /// @param[out] W  #F by k*2 list of winding numbers.  ``W(i,j*2)`` is the winding
-      ///      number on the positive side of facet ``i`` with respect to the
-      ///      facets labeled ``j``.  Similarly, ``W(i,j*2+1)`` is the winding
-      ///      number on the negative side of facet ``i`` with respect to the
-      ///      facets labeled ``j``.
-      /// @return true iff the input induces a piecewise-constant winding number
-      ///   field.
-      ///
-      /// \note This shouldn't need to be in igl::copyleft::cgal, it should
-      /// instead take as input an index of the ambient cell and the winding
-      /// number vector there.
+      // TODO: This shouldn't need to be in igl::copyleft::cgal, it should
+      // instead take as input an index of the ambient cell and the winding
+      // number vector there.
+      //
+      // Compute winding number on each side of the face.  The input mesh
+      // could contain multiple connected components.  The input mesh must
+      // represent the boundary of a valid 3D volume, which means it is
+      // closed, consistently oriented and induces integer winding numbers.
+      //
+      // Inputs:
+      //   V  #V by 3 list of vertex positions.
+      //   F  #F by 3 list of triangle indices into V.
+      //   labels  #F list of facet labels ranging from 0 to k-1.
+      // Output:
+      //   W  #F by k*2 list of winding numbers.  ``W(i,j*2)`` is the winding
+      //      number on the positive side of facet ``i`` with respect to the
+      //      facets labeled ``j``.  Similarly, ``W(i,j*2+1)`` is the winding
+      //      number on the negative side of facet ``i`` with respect to the
+      //      facets labeled ``j``.
+      // Returns true iff the input induces a piecewise-constant winding number
+      //   field.
       template<
         typename DerivedV,
         typename DerivedF,
@@ -54,15 +56,23 @@ namespace igl
         const Eigen::PlainObjectBase<DerivedF>& F,
         const Eigen::PlainObjectBase<DerivedL>& labels,
         Eigen::PlainObjectBase<DerivedW>& W);
-      // \overload
-      //
-      // @param[in] uE    #uE by 2 list of vertex_indices, represents undirected edges.
-      // @param[in] uEC  #uE+1 list of cumsums of directed edges sharing each unique edge
-      // @param[in] uEE  #E list of indices into E (see `igl::unique_edge_map`)
-      // @param[in] num_patches  number of patches
-      // @param[in] P  #F list of patch ids.
-      // @param[in] num_cells    number of cells
-      // @param[in] C  #P by 2 list of cell ids on each side of each patch.
+      // Inputs:
+      //   V  #V by 3 list of vertex positions.
+      //   F  #F by 3 list of triangle indices into V.
+      //   uE    #uE by 2 list of vertex_indices, represents undirected edges.
+      //   uEC  #uE+1 list of cumsums of directed edges sharing each unique edge
+      //   uEE  #E list of indices into E (see `igl::unique_edge_map`)
+      //   num_patches  number of patches
+      //   P  #F list of patch ids.
+      //   num_cells    number of cells
+      //   C  #P by 2 list of cell ids on each side of each patch.
+      //   labels  #F list of facet labels ranging from 0 to k-1.
+      // Output:
+      //   W  #F by k*2 list of winding numbers.  ``W(i,j*2)`` is the winding
+      //      number on the positive side of facet ``i`` with respect to the
+      //      facets labeled ``j``.  Similarly, ``W(i,j*2+1)`` is the winding
+      //      number on the negative side of facet ``i`` with respect to the
+      //      facets labeled ``j``.
       template<
         typename DerivedV,
         typename DerivedF,

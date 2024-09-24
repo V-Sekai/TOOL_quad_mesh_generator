@@ -18,7 +18,7 @@ namespace igl
 {
   namespace embree
   {
-     /// keep track of embree device instance
+     // keep track of embree device
      struct EmbreeDevice
      {
         RTCDevice embree_device;
@@ -59,16 +59,11 @@ namespace igl
             {
                 embree_device = rtcNewDevice (config);
                 if(rtcGetDeviceError (embree_device) != RTC_ERROR_NONE)
-                {
-                  assert(false && "Embree: An error occurred while initializing embree core!");
-#ifdef IGL_VERBOSE
-                  std::cerr << "Embree: An error occurred while initializing embree core!" << std::endl;
-                }
+                    std::cerr << "Embree: An error occurred while initializing embree core!" << std::endl;
+            #ifdef IGL_VERBOSE
                 else
-                {
-                  std::cerr << "Embree: core initialized." << std::endl;
-#endif
-                }
+                    std::cerr << "Embree: core initialized." << std::endl;
+            #endif
             }
             ++embree_device_cntr;
             return embree_device;
@@ -79,9 +74,9 @@ namespace igl
             if(!--embree_device_cntr) {
                 rtcReleaseDevice (embree_device);
                 embree_device = nullptr;                
-#ifdef IGL_VERBOSE
-                std::cerr << "Embree: core released." << std::endl;
-#endif
+            #ifdef IGL_VERBOSE
+                    std::cerr << "Embree: core released." << std::endl;
+            #endif
             }
         }
      };

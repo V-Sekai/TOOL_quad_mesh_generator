@@ -14,27 +14,26 @@
 #include <vector>
 namespace igl
 {
-  /// Write a matrix using ascii dmat file type
-  ///
-  /// @tparam Mat  matrix type that supports .rows(), .cols(), operator(i,j)
-  /// @param[in] file_name  path to .dmat file
-  /// @param[in] W  eigen matrix containing to-be-written coefficients
-  /// @param[in] ascii  write ascii file {true}
-  /// @return true on success, false on error
-  ///
-  /// \see readDMAT
+  // Write a matrix using ascii dmat file type
+  //
+  // Template:
+  //   Mat  matrix type that supports .rows(), .cols(), operator(i,j)
+  // Inputs:
+  //   file_name  path to .dmat file
+  //   W  eigen matrix containing to-be-written coefficients
+  //   ascii  write ascii file {true}
+  // Returns true on success, false on error
+  //
   template <typename DerivedW>
   IGL_INLINE bool writeDMAT(
     const std::string file_name, 
     const Eigen::MatrixBase<DerivedW> & W,
     const bool ascii=true);
-  /// \overload
   template <typename Scalar>
   IGL_INLINE bool writeDMAT(
     const std::string file_name, 
     const std::vector<std::vector<Scalar> > & W,
     const bool ascii=true);
-  /// \overload
   template <typename Scalar>
   IGL_INLINE bool writeDMAT(
     const std::string file_name, 

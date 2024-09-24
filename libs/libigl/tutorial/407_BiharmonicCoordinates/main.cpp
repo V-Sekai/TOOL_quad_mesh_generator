@@ -10,6 +10,7 @@
 #include <igl/readDMAT.h>
 #include <igl/readMESH.h>
 #include <igl/remove_unreferenced.h>
+#include <igl/slice.h>
 #include <igl/writeDMAT.h>
 #include <igl/opengl/glfw/Viewer.h>
 #include <Eigen/Sparse>
@@ -67,7 +68,8 @@ int main(int argc, char * argv[])
     // with the vertices in high resolution. b is the list of vertices
     // corresponding to the indices in high resolution which has closest
     // distance to the points in low resolution
-    low.V = high.V(b,Eigen::all);
+    igl::slice(high.V,b,1,low.V);
+
 
     // list of points --> list of singleton lists
     std::vector<std::vector<int> > S;
@@ -90,8 +92,8 @@ int main(int argc, char * argv[])
     igl::remove_unreferenced(high.V.rows(),high.F,I,J);
     for_each(high.F.data(),high.F.data()+high.F.size(),[&I](int & a){a=I(a);});
     for_each(b.data(),b.data()+b.size(),[&I](int & a){a=I(a);});
-    high.V = high.V(J,Eigen::all).eval();
-    W = W(J,Eigen::all).eval();
+    igl::slice(MatrixXd(high.V),J,1,high.V);
+    igl::slice(MatrixXd(W),J,1,W);
   }
 
   // Resize low res (high res will also be resized by affine precision of W)

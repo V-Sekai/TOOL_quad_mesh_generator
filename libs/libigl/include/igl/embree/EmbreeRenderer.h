@@ -13,7 +13,7 @@
 #ifndef IGL_EMBREE_EMBREE_RENDERER_H
 #define IGL_EMBREE_EMBREE_RENDERER_H
 
-#include "../colormap.h"
+#include <igl/colormap.h>
 
 #include <Eigen/Geometry>
 #include <Eigen/Core>
@@ -31,8 +31,7 @@ namespace igl
 {
   namespace embree
   {
-    /// @private
-    /// embree-based mesh renderer
+    // embree-based mesh renderer
     class EmbreeRenderer
     {
     public:

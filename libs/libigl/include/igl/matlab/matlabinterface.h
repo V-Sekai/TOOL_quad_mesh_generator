@@ -36,69 +36,49 @@ namespace igl
 {
   namespace matlab
   {
-    /// Init the MATLAB engine
-    /// (no need to call it directly since it is automatically invoked by any other command)
-    ///
-    /// @param[in,out] engine   pointer to the MATLAB engine
+    // Init the MATLAB engine
+    // (no need to call it directly since it is automatically invoked by any other command)
     IGL_INLINE void mlinit(Engine** engine);
   
-    /// Closes the MATLAB engine
-    ///
-    /// @param[in,out] engine   pointer to the MATLAB engine
+    // Closes the MATLAB engine
     IGL_INLINE void mlclose(Engine** engine);
   
-    /// Send a matrix to MATLAB
-    ///
-    /// @param[in,out] engine   pointer to the MATLAB engine
-    /// @param[in] name         name of the variable in MATLAB
-    /// @param[in] M            matrix to be sent
+    // Send a matrix to MATLAB
     IGL_INLINE void mlsetmatrix(Engine** engine, std::string name, const Eigen::MatrixXd& M);
   
-    /// \overload
+    // Send a matrix to MATLAB
     IGL_INLINE void mlsetmatrix(Engine** engine, std::string name, const Eigen::MatrixXf& M);
   
-    /// \overload
+    // Send a matrix to MATLAB
     IGL_INLINE void mlsetmatrix(Engine** engine, std::string name, const Eigen::MatrixXi& M);
   
-    /// \overload
+    // Send a matrix to MATLAB
     IGL_INLINE void mlsetmatrix(Engine** mlengine, std::string name, const Eigen::Matrix<unsigned int, Eigen::Dynamic, Eigen::Dynamic >& M);
-
-    /// \overload
-    IGL_INLINE void mlsetmatrix(Engine** mlengine, std::string name, const Eigen::SparseMatrix<double>& M);
   
-    /// Receive a matrix from MATLAB
-    ///
-    /// @param[in,out] engine   pointer to the MATLAB engine
-    /// @param[in] name         name of the variable in MATLAB
-    /// @param[out] M           matrix received
+    // Receive a matrix from MATLAB
     IGL_INLINE void mlgetmatrix(Engine** engine, std::string name, Eigen::MatrixXd& M);
   
-    /// \overload
+    // Receive a matrix from MATLAB
     IGL_INLINE void mlgetmatrix(Engine** engine, std::string name, Eigen::MatrixXf& M);
   
-    /// \overload
+    // Receive a matrix from MATLAB
     IGL_INLINE void mlgetmatrix(Engine** engine, std::string name, Eigen::MatrixXi& M);
   
-    /// \overload
+    // Receive a matrix from MATLAB
     IGL_INLINE void mlgetmatrix(Engine** mlengine, std::string name, Eigen::Matrix<unsigned int, Eigen::Dynamic, Eigen::Dynamic >& M);
   
-    /// Send a single scalar to MATLAB
-    ///
-    /// @param[in,out] engine   pointer to the MATLAB engine
-    /// @param[in] name         name of the variable in MATLAB
-    /// @param[in] M            value to be sent
+    // Send a single scalar to MATLAB
     IGL_INLINE void mlsetscalar(Engine** engine, std::string name, double s);
   
-    /// \overload
+    // Receive a single scalar from MATLAB
     IGL_INLINE double mlgetscalar(Engine** engine, std::string name);
   
-    /// Execute arbitrary MATLAB code and return the MATLAB output
-    ///
-    /// @param[in,out] engine   pointer to the MATLAB engine
-    /// @param[in] code         MATLAB code to be executed
-    /// @return                 output of the MATLAB code
-    ///
+    // Execute arbitrary MATLAB code and return the MATLAB output
     IGL_INLINE std::string mleval(Engine** engine, std::string code);
+  
+    // Send a sparse matrix to MATLAB
+    IGL_INLINE void mlsetmatrix(Engine** mlengine, std::string name, const Eigen::SparseMatrix<double>& M);
+  
   }
 }
 

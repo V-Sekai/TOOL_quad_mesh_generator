@@ -9,11 +9,10 @@
 #include "collapse_edge.h"
 #include "edge_flaps.h"
 #include "decimate_trivial_callbacks.h"
-#include "AABB.h"
-#include "intersection_blocking_collapse_edge_callbacks.h"
 #include "is_edge_manifold.h"
 #include "remove_unreferenced.h"
-#include "find.h"
+#include "slice_mask.h"
+#include "slice.h"
 #include "connect_boundary_to_infinity.h"
 #include "parallel_for.h"
 #include "max_faces_stopping_condition.h"
@@ -22,19 +21,12 @@
 IGL_INLINE bool igl::decimate(
   const Eigen::MatrixXd & V,
   const Eigen::MatrixXi & F,
-  const int max_m,
-  const bool block_intersections,
+  const size_t max_m,
   Eigen::MatrixXd & U,
   Eigen::MatrixXi & G,
   Eigen::VectorXi & J,
   Eigen::VectorXi & I)
 {
-  igl::AABB<Eigen::MatrixXd, 3> * tree = nullptr;
-  if(block_intersections)
-  {
-    tree = new igl::AABB<Eigen::MatrixXd, 3>();
-    tree->init(V,F);
-  }
   // Original number of faces
   const int orig_m = F.rows();
   // Tracking number of faces
@@ -58,23 +50,16 @@ IGL_INLINE bool igl::decimate(
       return false;
     }
   }
-  decimate_pre_collapse_callback pre_collapse;
-  decimate_post_collapse_callback post_collapse;
-  decimate_trivial_callbacks(pre_collapse,post_collapse);
-  if(block_intersections)
-  {
-    igl::intersection_blocking_collapse_edge_callbacks(
-      pre_collapse, post_collapse, // These will get copied as needed
-      tree,
-      pre_collapse, post_collapse);
-  }
+  decimate_pre_collapse_callback always_try;
+  decimate_post_collapse_callback never_care;
+  decimate_trivial_callbacks(always_try,never_care);
   bool ret = decimate(
     VO,
     FO,
     shortest_edge_and_midpoint,
     max_faces_stopping_condition(m,orig_m,max_m),
-    pre_collapse,
-    post_collapse,
+    always_try,
+    never_care,
     E,
     EMAP,
     EF,
@@ -84,14 +69,24 @@ IGL_INLINE bool igl::decimate(
     J,
     I);
   const Eigen::Array<bool,Eigen::Dynamic,1> keep = (J.array()<orig_m);
-  G = G(igl::find(keep),Eigen::all).eval();
-  J = J(igl::find(keep)).eval();
+  igl::slice_mask(Eigen::MatrixXi(G),keep,1,G);
+  igl::slice_mask(Eigen::VectorXi(J),keep,1,J);
   Eigen::VectorXi _1,I2;
   igl::remove_unreferenced(Eigen::MatrixXd(U),Eigen::MatrixXi(G),U,G,_1,I2);
-  I = I(I2).eval();
-  assert(tree == nullptr || tree == tree->root());
-  delete tree;
+  igl::slice(Eigen::VectorXi(I),I2,1,I);
   return ret;
+}
+
+IGL_INLINE bool igl::decimate(
+  const Eigen::MatrixXd & V,
+  const Eigen::MatrixXi & F,
+  const size_t max_m,
+  Eigen::MatrixXd & U,
+  Eigen::MatrixXi & G,
+  Eigen::VectorXi & J)
+{
+  Eigen::VectorXi I;
+  return igl::decimate(V,F,max_m,U,G,J,I);
 }
 
 IGL_INLINE bool igl::decimate(
@@ -142,10 +137,10 @@ IGL_INLINE bool igl::decimate(
   const decimate_stopping_condition_callback & stopping_condition,
   const decimate_pre_collapse_callback       & pre_collapse,
   const decimate_post_collapse_callback      & post_collapse,
-  const Eigen::MatrixXi & /*OE*/,
-  const Eigen::VectorXi & /*OEMAP*/,
-  const Eigen::MatrixXi & /*OEF*/,
-  const Eigen::MatrixXi & /*OEI*/,
+  const Eigen::MatrixXi & OE,
+  const Eigen::VectorXi & OEMAP,
+  const Eigen::MatrixXi & OEF,
+  const Eigen::MatrixXi & OEI,
   Eigen::MatrixXd & U,
   Eigen::MatrixXi & G,
   Eigen::VectorXi & J,
@@ -158,7 +153,6 @@ IGL_INLINE bool igl::decimate(
   // Working copies
   Eigen::MatrixXd V = OV;
   Eigen::MatrixXi F = OF;
-  // Why recompute this rather than copy input?
   VectorXi EMAP;
   MatrixXi E,EF,EI;
   edge_flaps(F,E,EMAP,EF,EI);

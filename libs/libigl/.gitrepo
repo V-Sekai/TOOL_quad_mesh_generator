@@ -5,8 +5,8 @@
 ;
 [subrepo]
 	remote = https://github.com/libigl/libigl.git
-	branch = main
-	commit = 0e02103df7b0f0303e055123de9489c56cae3978
-	parent = 0b77b895bd911c6446776288c76b4e4f0f83b62c
+	branch = f68e055b7dfb281489aa4b921fba65686ff4d456
+	commit = f68e055b7dfb281489aa4b921fba65686ff4d456
+	parent = 1962a1a94fb580e2e3079ad55b6c8f851d4eeca4
 	method = merge
 	cmdver = 0.4.6

@@ -15,15 +15,15 @@
 template<
   typename DerivedV,
   typename DerivedF,
-  typename Derivedfeature_edges >
+  typename DerivedE >
 IGL_INLINE void igl::copyleft::cgal::extract_feature(
     const Eigen::PlainObjectBase<DerivedV>& V,
     const Eigen::PlainObjectBase<DerivedF>& F,
     const double tol,
-    Eigen::PlainObjectBase<Derivedfeature_edges>& feature_edges) {
+    Eigen::PlainObjectBase<DerivedE>& feature_edges) {
 
-  using IndexType = typename Derivedfeature_edges::Scalar;
-  Derivedfeature_edges E, uE;
+  using IndexType = typename DerivedE::Scalar;
+  DerivedE E, uE;
   Eigen::VectorXi EMAP;
   std::vector<std::vector<IndexType> > uE2E;
   igl::unique_edge_map(F, E, uE, EMAP, uE2E);
@@ -34,22 +34,20 @@ IGL_INLINE void igl::copyleft::cgal::extract_feature(
 template<
   typename DerivedV,
   typename DerivedF,
-  typename DeriveduE,
-  typename Derivedfeature_edges
-  >
+  typename DerivedE >
 IGL_INLINE void igl::copyleft::cgal::extract_feature(
     const Eigen::PlainObjectBase<DerivedV>& V,
     const Eigen::PlainObjectBase<DerivedF>& F,
     const double tol,
-    const Eigen::PlainObjectBase<DeriveduE>& uE,
-    const std::vector<std::vector<typename DeriveduE::Scalar> >& uE2E,
-    Eigen::PlainObjectBase<Derivedfeature_edges>& feature_edges) 
-{
+    const Eigen::PlainObjectBase<DerivedE>& E,
+    const Eigen::PlainObjectBase<DerivedE>& uE,
+    const std::vector<std::vector<typename DerivedE::Scalar> >& uE2E,
+    Eigen::PlainObjectBase<DerivedE>& feature_edges) {
 
   assert(V.cols() == 3);
   assert(F.cols() == 3);
   using Scalar = typename DerivedV::Scalar;
-  using IndexType = typename DeriveduE::Scalar;
+  using IndexType = typename DerivedE::Scalar;
   using Vertex = Eigen::Matrix<Scalar, 3, 1>;
   using Kernel = typename CGAL::Exact_predicates_exact_constructions_kernel;
   using Point = typename Kernel::Point_3;
@@ -124,7 +122,3 @@ IGL_INLINE void igl::copyleft::cgal::extract_feature(
     feature_edges.row(i) = uE.row(result[i]);
   }
 }
-
-#ifdef IGL_STATIC_LIBRARY
-// Explicit template instantiation
-#endif

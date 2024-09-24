@@ -15,16 +15,18 @@
 
 namespace igl
 {
-  /// Given a skeleton and a set of relative bone rotations compute absolute
-  /// rigid transformations for each bone.
-  ///
-  /// @param[in] C  #C by dim list of joint positions
-  /// @param[in] BE  #BE by 2 list of bone edge indices
-  /// @param[in] P  #BE list of parent indices into BE
-  /// @param[in] dQ  #BE list of relative rotations
-  /// @param[in] dT  #BE list of relative translations
-  /// @param[out] vQ  #BE list of absolute rotations
-  /// @param[out] vT  #BE list of absolute translations
+  // Given a skeleton and a set of relative bone rotations compute absolute
+  // rigid transformations for each bone.
+  //
+  // Inputs:
+  //   C  #C by dim list of joint positions
+  //   BE  #BE by 2 list of bone edge indices
+  //   P  #BE list of parent indices into BE
+  //   dQ  #BE list of relative rotations
+  //   dT  #BE list of relative translations
+  // Outputs:
+  //   vQ  #BE list of absolute rotations
+  //   vT  #BE list of absolute translations
   IGL_INLINE void forward_kinematics(
     const Eigen::MatrixXd & C,
     const Eigen::MatrixXi & BE,
@@ -35,8 +37,7 @@ namespace igl
     std::vector<
       Eigen::Quaterniond,Eigen::aligned_allocator<Eigen::Quaterniond> > & vQ,
     std::vector<Eigen::Vector3d> & vT);
-  /// \overload
-  /// \brief assuming each dT[i] == {0,0,0}
+  // Wrapper assuming each dT[i] == {0,0,0}
   IGL_INLINE void forward_kinematics(
     const Eigen::MatrixXd & C,
     const Eigen::MatrixXi & BE,
@@ -46,8 +47,9 @@ namespace igl
     std::vector<
       Eigen::Quaterniond,Eigen::aligned_allocator<Eigen::Quaterniond> > & vQ,
     std::vector<Eigen::Vector3d> & vT);
-  /// \overload
-  /// @param[out] T  #BE*(dim+1) by dim stack of transposed transformation matrices
+
+  // Outputs:
+  //   T  #BE*(dim+1) by dim stack of transposed transformation matrices
   IGL_INLINE void forward_kinematics(
     const Eigen::MatrixXd & C,
     const Eigen::MatrixXi & BE,
@@ -56,7 +58,6 @@ namespace igl
       Eigen::Quaterniond,Eigen::aligned_allocator<Eigen::Quaterniond> > & dQ,
     const std::vector<Eigen::Vector3d> & dT,
     Eigen::MatrixXd & T);
-  /// \overload
   IGL_INLINE void forward_kinematics(
     const Eigen::MatrixXd & C,
     const Eigen::MatrixXi & BE,
@@ -64,6 +65,7 @@ namespace igl
     const std::vector<
       Eigen::Quaterniond,Eigen::aligned_allocator<Eigen::Quaterniond> > & dQ,
     Eigen::MatrixXd & T);
+
 };
 
 #ifndef IGL_STATIC_LIBRARY

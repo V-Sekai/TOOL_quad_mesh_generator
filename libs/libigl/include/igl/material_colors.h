@@ -8,11 +8,8 @@
 #ifndef IGL_MATERIAL_COLORS_H
 #define IGL_MATERIAL_COLORS_H
 #include <Eigen/Core>
-
-/// @file material_colors 
-///
-/// Define constant material colors for use with opengl glMaterialfv
-/// Most of these colors come from IGL publications
+// Define constant material colors for use with opengl glMaterialfv
+// Most of these colors come from IGL publications
 namespace igl
 {
   // Gold/Silver used in BBW/MONO/STBS/FAST

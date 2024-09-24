@@ -9,11 +9,10 @@
 #include "read_file_binary.h"
 
 #include <cstring>
-#include <cstdint>
 
 IGL_INLINE void igl::read_file_binary(
   FILE *fp,
-  std::vector<std::uint8_t> &fileBufferBytes) 
+  std::vector<uint8_t> &fileBufferBytes) 
 {
   if (!ferror(fp)) 
   {

@@ -1,7 +1,9 @@
 #include "point_areas.h"
 #include "delaunay_triangulation.h"
 
-#include "../../find.h"
+#include "../../colon.h"
+#include "../../slice.h"
+#include "../../slice_mask.h"
 #include "../../parallel_for.h"
 
 #include "CGAL/Exact_predicates_inexact_constructions_kernel.h"
@@ -47,9 +49,12 @@ namespace igl {
         typedef typename DerivedN::Scalar scalarN;
         typedef typename DerivedA::Scalar scalarA;
         typedef Eigen::Matrix<real,1,3> RowVec3;
+        typedef Eigen::Matrix<real,1,2> RowVec2;
         
         typedef Eigen::Matrix<real, Eigen::Dynamic, Eigen::Dynamic> MatrixP;
         typedef Eigen::Matrix<scalarN, Eigen::Dynamic, Eigen::Dynamic> MatrixN;
+        typedef Eigen::Matrix<typename DerivedN::Scalar,
+                  Eigen::Dynamic, Eigen::Dynamic> VecotorO;
         typedef Eigen::Matrix<typename DerivedI::Scalar,
                   Eigen::Dynamic, Eigen::Dynamic> MatrixI;
         
@@ -67,18 +72,19 @@ namespace igl {
         T.setZero(n,3);
         igl::parallel_for(P.rows(),[&](int i)
         {
+          MatrixI neighbor_index = I.row(i);
           MatrixP neighbors;
-          neighbors = P(I.row(i),Eigen::all);
+          igl::slice(P,neighbor_index,1,neighbors);
           if(N.rows() && neighbors.rows() > 1){
             MatrixN neighbor_normals;
-            neighbor_normals = N(I.row(i),Eigen::all);
+            igl::slice(N,neighbor_index,1,neighbor_normals);
             Eigen::Matrix<scalarN,1,3> poi_normal = neighbor_normals.row(0);
             Eigen::Matrix<scalarN,Eigen::Dynamic,1> dotprod =
                             poi_normal(0)*neighbor_normals.col(0)
             + poi_normal(1)*neighbor_normals.col(1)
             + poi_normal(2)*neighbor_normals.col(2);
             Eigen::Array<bool,Eigen::Dynamic,1> keep = dotprod.array() > 0;
-            neighbors = neighbors(igl::find(keep),Eigen::all).eval();
+            igl::slice_mask(Eigen::MatrixXd(neighbors),keep,1,neighbors);
           }
           if(neighbors.rows() <= 2){
             A(i) = 0;
@@ -96,7 +102,9 @@ namespace igl {
               T.row(i) *= -1;
             }
             
-            MatrixP plane = scores(Eigen::all,{0,1});
+            MatrixP plane;
+            igl::slice(scores,igl::colon<int>(0,scores.rows()-1),
+                     igl::colon<int>(0,1),plane);
             
             std::vector< std::pair<Point,unsigned> > points;
             //This is where we obtain a delaunay triangulation of the points

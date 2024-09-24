@@ -6,19 +6,14 @@
 namespace igl {
   namespace copyleft {
     namespace cgal {
-      /// Peel Winding number layers from a mesh
-      ///
-      /// @param[in] V  #V by 3 list of vertex positions
-      /// @param[in] F  #F by 3 list of triangle indices into V
-      /// @param[out] W  #V by 1 list of winding numbers
-      template<
-          typename DerivedV,
-          typename DerivedF,
-          typename DerivedW >
-      IGL_INLINE size_t peel_winding_number_layers(
-              const Eigen::PlainObjectBase<DerivedV > & V,
-              const Eigen::PlainObjectBase<DerivedF > & F,
-              Eigen::PlainObjectBase<DerivedW>& W);
+        template<
+            typename DerivedV,
+            typename DerivedF,
+            typename DerivedW >
+        IGL_INLINE size_t peel_winding_number_layers(
+                const Eigen::PlainObjectBase<DerivedV > & V,
+                const Eigen::PlainObjectBase<DerivedF > & F,
+                Eigen::PlainObjectBase<DerivedW>& W);
     }
   }
 }

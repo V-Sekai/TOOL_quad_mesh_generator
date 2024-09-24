@@ -6,7 +6,6 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 #include "cumsum.h"
-#include "parallel_for.h"
 #include <numeric>
 #include <iostream>
 
@@ -43,7 +42,8 @@ IGL_INLINE void igl::cumsum(
     {
       Y.row(0).setConstant(0);
     }
-    parallel_for(num_outer,[&](const int o)
+#pragma omp parallel for
+    for(Eigen::Index o = 0;o<num_outer;o++)
     {
       typename DerivedX::Scalar sum = 0;
       for(Eigen::Index i = 0;i<num_inner;i++)
@@ -52,7 +52,7 @@ IGL_INLINE void igl::cumsum(
         const Eigen::Index yi = zero_prefix?i+1:i;
         Y(yi,o) = sum;
       }
-    },1000);
+    }
   }else
   {
     if(zero_prefix)
@@ -62,7 +62,10 @@ IGL_INLINE void igl::cumsum(
     for(Eigen::Index i = 0;i<num_inner;i++)
     {
       const Eigen::Index yi = zero_prefix?i+1:i;
-      parallel_for(num_outer,[&](const int o)
+      // Notice that it is *not* OK to put this above the inner loop
+      // Though here it doesn't seem to pay off...
+//#pragma omp parallel for
+      for(Eigen::Index o = 0;o<num_outer;o++)
       {
         if(i == 0)
         {
@@ -71,7 +74,7 @@ IGL_INLINE void igl::cumsum(
         {
           Y(o,yi) = Y(o,yi-1) + X(o,i);
         }
-      },1000);
+      }
     }
   }
 }

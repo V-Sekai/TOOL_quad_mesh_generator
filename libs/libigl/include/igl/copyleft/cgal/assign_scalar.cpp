@@ -7,8 +7,6 @@
 // obtain one at http://mozilla.org/MPL/2.0/.
 #include "assign_scalar.h"
 
-#include <cmath>
-
 template <>
 IGL_INLINE void igl::copyleft::cgal::assign_scalar(
   const CGAL::Epeck::FT & rhs,
@@ -55,7 +53,7 @@ IGL_INLINE void igl::copyleft::cgal::assign_scalar(
 template <typename RHS, typename LHS>
 IGL_INLINE void igl::copyleft::cgal::assign_scalar(
   const RHS & rhs,
-  const bool & /*slow_and_more_precise*/,
+  const bool & slow_and_more_precise,
   LHS & lhs)
 {
   return assign_scalar(rhs,lhs);
@@ -77,7 +75,7 @@ IGL_INLINE void igl::copyleft::cgal::assign_scalar(
   const auto interval = CGAL::to_interval(cgal);
   d = interval.first;
   do {
-      const double next = std::nextafter(d, interval.second);
+      const double next = nextafter(d, interval.second);
       if (CGAL::abs(cgal-d) < CGAL::abs(cgal-next)) break;
       d = next;
   } while (d < interval.second);
@@ -92,7 +90,7 @@ IGL_INLINE void igl::copyleft::cgal::assign_scalar(
   const auto interval = CGAL::to_interval(cgal);
   d = interval.first;
   do {
-      const float next = std::nextafter(d, float(interval.second));
+      const float next = nextafter(d, float(interval.second));
       if (CGAL::abs(cgal-d) < CGAL::abs(cgal-next)) break;
       d = next;
   } while (d < float(interval.second));
@@ -133,7 +131,7 @@ IGL_INLINE void igl::copyleft::cgal::assign_scalar(
   const auto interval = CGAL::to_interval(cgal);
   d = interval.first;
   do {
-      const double next = std::nextafter(d, interval.second);
+      const double next = nextafter(d, interval.second);
       if (CGAL::abs(cgal-d) < CGAL::abs(cgal-next)) break;
       d = next;
   } while (d < interval.second);
@@ -146,7 +144,7 @@ IGL_INLINE void igl::copyleft::cgal::assign_scalar(
   const auto interval = CGAL::to_interval(cgal);
   d = interval.first;
   do {
-      const float next = std::nextafter(d, float(interval.second));
+      const float next = nextafter(d, float(interval.second));
       if (CGAL::abs(cgal-d) < CGAL::abs(cgal-next)) break;
       d = next;
   } while (d < float(interval.second));
@@ -168,7 +166,7 @@ IGL_INLINE void igl::copyleft::cgal::assign_scalar(
   const auto interval = CGAL::to_interval(cgal);
   d = interval.first;
   do {
-      const double next = std::nextafter(d, interval.second);
+      const double next = nextafter(d, interval.second);
       if (CGAL::abs(cgal-d) < CGAL::abs(cgal-next)) break;
       d = next;
   } while (d < interval.second);
@@ -181,7 +179,7 @@ IGL_INLINE void igl::copyleft::cgal::assign_scalar(
   const auto interval = CGAL::to_interval(cgal);
   d = interval.first;
   do {
-      const float next = std::nextafter(d, float(interval.second));
+      const float next = nextafter(d, float(interval.second));
       if (CGAL::abs(cgal-d) < CGAL::abs(cgal-next)) break;
       d = next;
   } while (d < float(interval.second));

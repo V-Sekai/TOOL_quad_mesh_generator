@@ -13,94 +13,154 @@
 // STL includes
 #include <cassert>
 
-template <
-  typename DerivedV, 
-  typename DerivedF, 
-  typename DerivedH, 
-  typename DerivedVM, 
-  typename DerivedFM, 
-  typename DerivedR>
-IGL_INLINE void igl::copyleft::tetgen::mesh_to_tetgenio(
-  const Eigen::MatrixBase<DerivedV>& V,
-  const Eigen::MatrixBase<DerivedF>& F,
-  const Eigen::MatrixBase<DerivedH>& H,
-  const Eigen::MatrixBase<DerivedVM>& VM,
-  const Eigen::MatrixBase<DerivedFM>& FM,
-  const Eigen::MatrixBase<DerivedR>& R,
+
+IGL_INLINE bool igl::copyleft::tetgen::mesh_to_tetgenio(
+  const std::vector<std::vector<REAL > > & V,
+  const std::vector<std::vector<int> > & F,
+  const std::vector<std::vector<REAL> > & H, 
+  const std::vector<std::vector<REAL> > & R, 
   tetgenio & in)
 {
   using namespace std;
-  assert(V.cols() == 3 && "V should have 3 columns");
-  assert((VM.size() == 0 || VM.size() == V.rows()) && "VM should be empty or #V by 1");
-  assert((FM.size() == 0 || FM.size() == F.rows()) && "FM should be empty or #F by 1");
   in.firstnumber = 0;
-  in.numberofpoints = V.rows();
+  in.numberofpoints = V.size();
   in.pointlist = new REAL[in.numberofpoints * 3];
-  if(VM.size())
-  {
-    in.pointmarkerlist = new int[VM.size()];
-  }
   //loop over points
-  for(int i = 0; i < V.rows(); i++)
+  for(size_t i = 0; i < (size_t)V.size(); i++)
   {
-    in.pointlist[i*3+0] = V(i,0);
-    in.pointlist[i*3+1] = V(i,1);
-    in.pointlist[i*3+2] = V(i,2);    
-    if(VM.size())
-    {
-      in.pointmarkerlist[i] = VM(i);
-    }
+    assert(V[i].size() == 3);
+    in.pointlist[i*3+0] = V[i][0];
+    in.pointlist[i*3+1] = V[i][1];
+    in.pointlist[i*3+2] = V[i][2];    
   }
-  in.numberoffacets = F.rows();
+  in.numberoffacets = F.size();
   in.facetlist = new tetgenio::facet[in.numberoffacets];
   in.facetmarkerlist = new int[in.numberoffacets];
 
   // loop over face
-  for(int i = 0;i < F.rows(); i++)
+  for(size_t i = 0;i < (size_t)F.size(); i++)
   {
-    in.facetmarkerlist[i] = FM.size() ? FM(i) : i;
+    in.facetmarkerlist[i] = i;
     tetgenio::facet * f = &in.facetlist[i];
     f->numberofpolygons = 1;
     f->polygonlist = new tetgenio::polygon[f->numberofpolygons];
     f->numberofholes = 0;
     f->holelist = NULL;
     tetgenio::polygon * p = &f->polygonlist[0];
-    p->numberofvertices = (F.row(i).array() >= 0).count();
+    p->numberofvertices = F[i].size();
     p->vertexlist = new int[p->numberofvertices];
     // loop around face
-    for(int j = 0;j < p->numberofvertices; j++)
+    for(int j = 0;j < (int)F[i].size(); j++)
     {
-      p->vertexlist[j] = F(i,j);
+      p->vertexlist[j] = F[i][j];
     }
   }
   
-  in.numberofholes = H.rows(); 
-  in.holelist = new REAL[3 * in.numberofholes];
+  in.numberofholes = H.size(); 
+  in.holelist = new double[3 * in.numberofholes];
   // loop over holes
-  for(int holeID = 0; holeID < H.rows(); holeID++)
+  for(size_t holeID = 0, nHoles = H.size(); holeID < nHoles; holeID++)
   {
-    in.holelist[holeID * 3 + 0] = H(holeID,0); 
-    in.holelist[holeID * 3 + 1] = H(holeID,1);
-    in.holelist[holeID * 3 + 2] = H(holeID,2);
-  }  
+    in.holelist[holeID * 3 + 0] = H[holeID][0]; 
+    in.holelist[holeID * 3 + 1] = H[holeID][1];
+    in.holelist[holeID * 3 + 2] = H[holeID][2];
+  }	  
 
-  in.numberofregions = R.rows();
+  in.numberofregions = R.size();
   in.regionlist = new REAL[ 5 * in.numberofregions];
   // loop over regions
-  for(int regionID = 0; regionID < R.rows(); regionID++)
+  for(size_t regionID = 0, nRegions = R.size(); regionID < nRegions; regionID++)
   {
-    in.regionlist[regionID * 5 + 0] = R(regionID,0); 
-    in.regionlist[regionID * 5 + 1] = R(regionID,1);
-    in.regionlist[regionID * 5 + 2] = R(regionID,2);
-    in.regionlist[regionID * 5 + 3] = R(regionID,3);
-    in.regionlist[regionID * 5 + 4] = R(regionID,4);
-  }  
+    in.regionlist[regionID * 5 + 0] = R[regionID][0]; 
+    in.regionlist[regionID * 5 + 1] = R[regionID][1];
+    in.regionlist[regionID * 5 + 2] = R[regionID][2];
+    in.regionlist[regionID * 5 + 3] = R[regionID][3];
+    in.regionlist[regionID * 5 + 4] = R[regionID][4];
+  }	  
 
+  return true;
+    
+}	
+
+template <typename DerivedV, typename DerivedF, typename DerivedH, typename DerivedR>
+IGL_INLINE bool igl::copyleft::tetgen::mesh_to_tetgenio(
+  const Eigen::PlainObjectBase<DerivedV>& V,
+  const Eigen::PlainObjectBase<DerivedF>& F,
+  const Eigen::PlainObjectBase<DerivedH>& H,
+  const Eigen::PlainObjectBase<DerivedR>& R,
+  tetgenio & in)
+{
+  using namespace std;
+  vector<vector<REAL> > vV, vH, vR;
+  vector<vector<int> > vF;
+  matrix_to_list(V,vV);
+  matrix_to_list(F,vF);
+  matrix_to_list(H, vH);
+  matrix_to_list(R, vR);
+  return mesh_to_tetgenio(vV,vF,vH,vR,in);
 }
 
 
+IGL_INLINE bool igl::copyleft::tetgen::mesh_to_tetgenio(
+  const std::vector<std::vector<REAL > > & V, 
+  const std::vector<std::vector<int> > & F, 
+  tetgenio & in)
+{
+  using namespace std;
+  // all indices start from 0
+  in.firstnumber = 0;
+
+  in.numberofpoints = V.size();
+  in.pointlist = new REAL[in.numberofpoints * 3];
+  // loop over points
+  for(int i = 0; i < (int)V.size(); i++)
+  {
+    assert(V[i].size() == 3);
+    in.pointlist[i*3+0] = V[i][0];
+    in.pointlist[i*3+1] = V[i][1];
+    in.pointlist[i*3+2] = V[i][2];
+  }
+
+  in.numberoffacets = F.size();
+  in.facetlist = new tetgenio::facet[in.numberoffacets];
+  in.facetmarkerlist = new int[in.numberoffacets];
+
+  // loop over face
+  for(int i = 0;i < (int)F.size(); i++)
+  {
+    in.facetmarkerlist[i] = i;
+    tetgenio::facet * f = &in.facetlist[i];
+    f->numberofpolygons = 1;
+    f->polygonlist = new tetgenio::polygon[f->numberofpolygons];
+    f->numberofholes = 0;
+    f->holelist = NULL;
+    tetgenio::polygon * p = &f->polygonlist[0];
+    p->numberofvertices = F[i].size();
+    p->vertexlist = new int[p->numberofvertices];
+    // loop around face
+    for(int j = 0;j < (int)F[i].size(); j++)
+    {
+      p->vertexlist[j] = F[i][j];
+    }
+  }
+  return true;
+}
+
+template <typename DerivedV, typename DerivedF>
+IGL_INLINE bool igl::copyleft::tetgen::mesh_to_tetgenio(
+  const Eigen::PlainObjectBase<DerivedV>& V,
+  const Eigen::PlainObjectBase<DerivedF>& F,
+  tetgenio & in)
+{
+  using namespace std;
+  vector<vector<REAL> > vV;
+  vector<vector<int> > vF;
+  matrix_to_list(V,vV);
+  matrix_to_list(F,vF);
+  return mesh_to_tetgenio(vV,vF,in);
+}
+
 #ifdef IGL_STATIC_LIBRARY
 // Explicit template instantiation
-// generated by autoexplicit.sh
-template void igl::copyleft::tetgen::mesh_to_tetgenio<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1>, Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, 1, 0, -1, 1>, Eigen::Matrix<int, -1, 1, 0, -1, 1>, Eigen::Matrix<double, -1, -1, 0, -1, -1>>(Eigen::MatrixBase<Eigen::Matrix<double, -1, -1, 0, -1, -1>> const&, Eigen::MatrixBase<Eigen::Matrix<int, -1, -1, 0, -1, -1>> const&, Eigen::MatrixBase<Eigen::Matrix<double, -1, -1, 0, -1, -1>> const&, Eigen::MatrixBase<Eigen::Matrix<int, -1, 1, 0, -1, 1>> const&, Eigen::MatrixBase<Eigen::Matrix<int, -1, 1, 0, -1, 1>> const&, Eigen::MatrixBase<Eigen::Matrix<double, -1, -1, 0, -1, -1>> const&, tetgenio&);
+template bool igl::copyleft::tetgen::mesh_to_tetgenio<Eigen::Matrix<double, -1, -1, 0, -1, -1>, Eigen::Matrix<int, -1, -1, 0, -1, -1> >(Eigen::PlainObjectBase<Eigen::Matrix<double, -1, -1, 0, -1, -1> > const&, Eigen::PlainObjectBase<Eigen::Matrix<int, -1, -1, 0, -1, -1> > const&, tetgenio&);
 #endif

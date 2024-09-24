@@ -6,10 +6,9 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can 
 // obtain one at http://mozilla.org/MPL/2.0/.
 #include "rigid_alignment.h"
+#include "polar_svd.h"
 #include <Eigen/Sparse>
-#include <Eigen/QR>
-// Not currently used. See below.
-//#include <Eigen/Cholesky>
+#include <Eigen/Cholesky>
 #include <vector>
 #include <iostream>
 
@@ -40,8 +39,6 @@ IGL_INLINE void igl::rigid_alignment(
   t = Derivedt::Zero(1,3);
   // See gptoolbox, each iter could be O(1) instead of O(k)
   const int max_iters = 5;
-  // Weight on point-to-point regularization.
-  Scalar w = 1e-5;
   for(int iters = 0;iters<max_iters;iters++)
   {
     MatrixXS A(k*3,6);
@@ -54,8 +51,6 @@ IGL_INLINE void igl::rigid_alignment(
       P.col(0)-X.col(0),
       P.col(1)-X.col(1),
       P.col(2)-X.col(2);
-
-
     std::vector<Eigen::Triplet<Scalar> > NNIJV;
     for(int i = 0;i<k;i++)
     {
@@ -66,24 +61,11 @@ IGL_INLINE void igl::rigid_alignment(
     }
     Eigen::SparseMatrix<Scalar> NN(k,k*3);
     NN.setFromTriplets(NNIJV.begin(),NNIJV.end());
-
-    MatrixXS NA = (NN * A).eval();
-    VectorXS NB = (NN * B).eval();
-
-    MatrixXS Q = (1.0-w)*(NA.transpose() * NA) + w * A.transpose() * A;
-    VectorXS f = (1.0-w)*(NA.transpose() * NB) + w * A.transpose() * B;
-    // This could be a lot faster but isn't rank revealing and may produce wonky
-    // results when P and N are all the same point and vector.
-    //VectorXS u = (Q).ldlt().solve(f);
-    
-    Eigen::CompleteOrthogonalDecomposition<decltype(Q)> qr(Q);
-    if(qr.rank() < 6)
-    {
-      w = 1.0-(1.0-w)/2.0;
-    }
-
-    VectorXS u = qr.solve(f);
+    A = (NN * A).eval();
+    B = (NN * B).eval();
+    VectorXS u = (A.transpose() * A).ldlt().solve(A.transpose() * B);
     Derivedt ti = u.tail(3).transpose();
+
     Matrix3S W;
     W<<
           0, u(2),-u(1),

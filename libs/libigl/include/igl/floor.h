@@ -11,10 +11,12 @@
 #include <Eigen/Dense>
 namespace igl
 {
-  /// Floor a given matrix to nearest integers 
-  ///
-  /// @param[in] X  m by n matrix of scalars
-  /// @param[out] Y  m by n matrix of floored integers
+  // Floor a given matrix to nearest integers 
+  //
+  // Inputs:
+  //   X  m by n matrix of scalars
+  // Outputs:
+  //   Y  m by n matrix of floored integers
   template < typename DerivedX, typename DerivedY>
   IGL_INLINE void floor(
     const Eigen::PlainObjectBase<DerivedX>& X,

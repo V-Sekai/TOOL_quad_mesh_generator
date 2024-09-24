@@ -13,16 +13,17 @@
 
 namespace igl
 {
-  /// Applies a trackball drag to identity
-  ///
-  /// @param[in] w  width of the trackball context
-  /// @param[in] h  height of the trackball context
-  /// @param[in] speed_factor  controls how fast the trackball feels, 1 is normal
-  /// @param[in] down_mouse_x  x position of mouse down
-  /// @param[in] down_mouse_y  y position of mouse down
-  /// @param[in] mouse_x  current x position of mouse
-  /// @param[in] mouse_y  current y position of mouse
-  /// @param[out] quat  the resulting rotation (as quaternion)
+  // Applies a trackball drag to identity
+  // Inputs:
+  //   w  width of the trackball context
+  //   h  height of the trackball context
+  //   speed_factor  controls how fast the trackball feels, 1 is normal
+  //   down_mouse_x  x position of mouse down
+  //   down_mouse_y  y position of mouse down
+  //   mouse_x  current x position of mouse
+  //   mouse_y  current y position of mouse
+  // Outputs:
+  //   quat  the resulting rotation (as quaternion)
   template <typename Q_type>
   IGL_INLINE void trackball(
     const double w,
@@ -33,18 +34,20 @@ namespace igl
     const double mouse_x,
     const double mouse_y,
     Q_type * quat);
-  /// Applies a trackball drag to a given rotation
-  ///
-  /// @param[in] w  width of the trackball context
-  /// @param[in] h  height of the trackball context
-  /// @param[in] speed_factor  controls how fast the trackball feels, 1 is normal
-  /// @param[in] down_quat  rotation at mouse down, i.e. the rotation we're applying the
-  ///              trackball motion to (as quaternion)
-  /// @param[in] down_mouse_x  x position of mouse down
-  /// @param[in] down_mouse_y  y position of mouse down
-  /// @param[in] mouse_x  current x position of mouse
-  /// @param[in] mouse_y  current y position of mouse
-  /// @param[out] quat  the resulting rotation (as quaternion)
+
+  // Applies a trackball drag to a given rotation
+  // Inputs:
+  //   w  width of the trackball context
+  //   h  height of the trackball context
+  //   speed_factor  controls how fast the trackball feels, 1 is normal
+  //   down_quat  rotation at mouse down, i.e. the rotation we're applying the
+  //     trackball motion to (as quaternion)
+  //   down_mouse_x  x position of mouse down
+  //   down_mouse_y  y position of mouse down
+  //   mouse_x  current x position of mouse
+  //   mouse_y  current y position of mouse
+  // Outputs:
+  //   quat  the resulting rotation (as quaternion)
   template <typename Q_type>
   IGL_INLINE void trackball(
     const double w,
@@ -56,7 +59,7 @@ namespace igl
     const double mouse_x,
     const double mouse_y,
     Q_type * quat);
-  /// \overload
+  // Eigen wrapper.
   template <typename Scalardown_quat, typename Scalarquat>
   IGL_INLINE void trackball(
     const double w,

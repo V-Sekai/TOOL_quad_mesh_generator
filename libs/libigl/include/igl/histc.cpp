@@ -6,7 +6,6 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can 
 // obtain one at http://mozilla.org/MPL/2.0/.
 #include "histc.h"
-#include "parallel_for.h"
 #include <cassert>
 #include <iostream>
 
@@ -23,10 +22,12 @@ IGL_INLINE void igl::histc(
   assert(m == B.size());
   N.resize(n,1);
   N.setConstant(0);
+#pragma omp parallel for
   for(int j = 0;j<m;j++)
   {
     if(B(j) >= 0)
     {
+#pragma omp atomic
       N(int(B(j)))++;
     }
   }
@@ -45,14 +46,15 @@ IGL_INLINE void igl::histc(
       E.topLeftCorner(E.size()-1,1)).maxCoeff() >= 0 && 
     "E should be monotonically increasing");
   B.resize(m,1);
-  parallel_for(m,[&](const int j)
+#pragma omp parallel for
+  for(int j = 0;j<m;j++)
   {
     const double x = X(j);
     // Boring one-offs
     if(x < E(0) || x > E(E.size()-1))
     {
       B(j) = -1;
-      return;
+      continue;
     }
     // Find x in E
     int l = 0;
@@ -79,7 +81,7 @@ IGL_INLINE void igl::histc(
       k = l;
     }
     B(j) = k;
-  },1000);
+  }
 }
 
 template <typename DerivedE>

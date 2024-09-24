@@ -11,7 +11,7 @@
 #include "../project_to_line_segment.h"
 #include "../cotmatrix.h"
 #include "../massmatrix.h"
-#include "../min.h"
+#include "../mat_min.h"
 #include <Eigen/Sparse>
 
 bool igl::embree::bone_heat(
@@ -72,13 +72,16 @@ bool igl::embree::bone_heat(
     vis_mask.col(np+j) = vj;
   }
 
-  assert(CE.rows() == 0 && "Cage edges not supported.");
+  if(CE.rows() > 0)
+  {
+    cerr<<"Error: Cage edges are not supported. Ignored."<<endl;
+  }
 
   MatrixXd PP = MatrixXd::Zero(n,m);
   VectorXd min_D;
   VectorXd Hdiag = VectorXd::Zero(n);
   VectorXi J;
-  igl::min(D,2,min_D,J);
+  mat_min(D,2,min_D,J);
   for(int i = 0;i<n;i++)
   {
     PP(i,J(i)) = 1;
@@ -100,14 +103,10 @@ bool igl::embree::bone_heat(
     case Eigen::Success:
       break;
     case Eigen::NumericalIssue:
-#ifdef IGL_BONE_HEAT_DEBUG
       cerr<<"Error: Numerical issue."<<endl;
-#endif
       return false;
     default:
-#ifdef IGL_BONE_HEAT_DEBUG
       cerr<<"Error: Other."<<endl;
-#endif
       return false;
   }
 

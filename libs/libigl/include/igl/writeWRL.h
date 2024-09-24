@@ -12,20 +12,27 @@
 #include <string>
 namespace igl
 {
-  /// Write mesh to a .wrl file
-  ///
-  /// @param[in] str  path to .wrl file
-  /// @param[in] V  #V by 3 list of vertex positions
-  /// @param[in] F  #F by 3 list of triangle indices
-  /// @return true iff succes
+  // Write mesh to a .wrl file
+  //
+  // Inputs:
+  //   str  path to .wrl file
+  //   V  #V by 3 list of vertex positions
+  //   F  #F by 3 list of triangle indices
+  // Returns true iff succes
   template <typename DerivedV, typename DerivedF>
   IGL_INLINE bool writeWRL(
     const std::string & str,
     const Eigen::MatrixBase<DerivedV> & V,
     const Eigen::MatrixBase<DerivedF> & F);
-  /// \overload
-  ///
-  /// @param[in] C  double matrix of rgb values per vertex #V by 3
+
+  // Write mesh to a .wrl file
+  //
+  // Inputs:
+  //   str  path to .wrl file
+  //   V  #V by 3 list of vertex positions
+  //   F  #F by 3 list of triangle indices
+  //   C  double matrix of rgb values per vertex #V by 3
+  // Returns true iff succes
   template <typename DerivedV, typename DerivedF, typename DerivedC>
   IGL_INLINE bool writeWRL(
     const std::string & str,

@@ -17,24 +17,20 @@ namespace igl
   {
     namespace cgal
     {
-      /// Vector version of assign_scalar
-      ///
-      /// @param[in] C  matrix of scalars
-      /// @param[in] slow_and_more_precise  see assign_scalar
-      /// @param[out] D  matrix same size as C
-      ///
-      /// \see assign_scalar
+      // Inputs:
+      //   C  matrix of scalars
+      //   slow_and_more_precise  see assign_scalar
+      // Outputs:
+      //   D  matrix same size as C
       template <typename DerivedC, typename DerivedD>
       IGL_INLINE void assign(
         const Eigen::MatrixBase<DerivedC> & C,
         const bool slow_and_more_precise,
         Eigen::PlainObjectBase<DerivedD> & D);
-      /// \overload
       template <typename DerivedC, typename DerivedD>
       IGL_INLINE void assign(
         const Eigen::MatrixBase<DerivedC> & C,
         Eigen::PlainObjectBase<DerivedD> & D);
-      /// \overload
       template <typename ReturnScalar, typename DerivedC>
       IGL_INLINE 
       Eigen::Matrix<

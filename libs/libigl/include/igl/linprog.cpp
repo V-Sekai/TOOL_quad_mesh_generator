@@ -6,6 +6,8 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can 
 // obtain one at http://mozilla.org/MPL/2.0/.
 #include "linprog.h"
+#include "slice.h"
+#include "slice_into.h"
 #include "find.h"
 #include "colon.h"
 
@@ -76,7 +78,8 @@ IGL_INLINE bool igl::linprog(
     J.head(j) = B.head(j);
     J.tail(B.size()-j-1) = B.tail(B.size()-j-1);
     B(j) = n+m;
-    MatrixXd AJ = A(Eigen::all,J);
+    MatrixXd AJ;
+    igl::slice(A,J,2,AJ);
     const VectorXd a = b - AJ.rowwise().sum();
     {
       MatrixXd old_A = A;
@@ -105,7 +108,7 @@ IGL_INLINE bool igl::linprog(
     double df = -1;
     int t = std::numeric_limits<int>::max();
     // Lagrange mutipliers fro Ax=b
-    VectorXd yb = D.transpose() * s(B);
+    VectorXd yb = D.transpose() * igl::slice(s,B);
     while(true)
     {
       if(MAXIT>0 && it>=MAXIT)
@@ -122,8 +125,8 @@ IGL_INLINE bool igl::linprog(
         break;
       }
       // reduced costs
-      VectorXd sN = s(N);
-      MatrixXd AN = A(Eigen::all,N);
+      VectorXd sN = igl::slice(s,N);
+      MatrixXd AN = igl::slice(A,N,2);
       VectorXd r = sN - AN.transpose() * yb;
       int q;
       // determine new basic variable
@@ -146,7 +149,7 @@ IGL_INLINE bool igl::linprog(
           success = false;
         }
         igl::find((r.array()<0).eval(),J);
-        double Nq = N(J).minCoeff();
+        double Nq = igl::slice(N,J).minCoeff();
         // again seems like q is assumed to be a scalar though matlab code
         // could produce a vector for multiple matches
         (N.array()==Nq).cast<int>().maxCoeff(&q);
@@ -164,7 +167,7 @@ IGL_INLINE bool igl::linprog(
         success = false;
         break;
       }
-      VectorXd xbd = xb(I).array()/d(I).array();
+      VectorXd xbd = igl::slice(xb,I).array()/igl::slice(d,I).array();
       // new use of r
       int p;
       {
@@ -175,7 +178,7 @@ IGL_INLINE bool igl::linprog(
         if(df>=0)
         {
           igl::find((xbd.array()==r).eval(),J);
-          double Bp = B(I(J)).minCoeff();
+          double Bp = igl::slice(B,igl::slice(I,J)).minCoeff();
           // idiotic way of finding index in B of Bp
           // code down the line seems to assume p is a scalar though the matlab
           // code could find a vector of matches)
@@ -189,7 +192,7 @@ IGL_INLINE bool igl::linprog(
       }
       // row vector
       RowVectorXd v = D.row(p)/d(p);
-      yb += v.transpose() * (s(N(q)) - d.transpose()*s(B));
+      yb += v.transpose() * (s(N(q)) - d.transpose()*igl::slice(s,B));
       d(p)-=1;
       // update inverse basis matrix
       D = D - d*v;
@@ -209,21 +212,22 @@ IGL_INLINE bool igl::linprog(
       }
     }
     // iterative refinement
-    xb = (xb+D*(b-A(Eigen::all,B)*xb)).eval();
+    xb = (xb+D*(b-igl::slice(A,B,2)*xb)).eval();
     // must be due to rounding
     VectorXi I;
     igl::find((xb.array()<0).eval(),I);
     if(I.size()>0)
     {
       // so correct
-      xb(I) = VectorXd::Zero(I.size(),1);
+      VectorXd Z = VectorXd::Zero(I.size(),1);
+      igl::slice_into(Z,I,xb);
     }
     // B, xb,n,m,res=A(:,B)*xb-b
     if(phase == 2 || it<0)
     {
       break;
     }
-    if(xb.transpose()*s(B) > tol)
+    if(xb.transpose()*igl::slice(s,B) > tol)
     {
       it = -it;
 #ifdef IGL_LINPROG_VERBOSE
@@ -238,7 +242,7 @@ IGL_INLINE bool igl::linprog(
     s.head(n) = c;
   }
   x.setZero(std::max(B.maxCoeff()+1,n));
-  x(B) = xb;
+  igl::slice_into(xb,B,x);
   x = x.head(n).eval();
   return success;
 }

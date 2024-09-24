@@ -14,7 +14,7 @@
 #else
   #include <unistd.h>
 #endif
-#include <cstdint>
+#include <stdint.h>
 
 IGL_INLINE std::string igl::path_to_executable()
 {
@@ -22,7 +22,7 @@ IGL_INLINE std::string igl::path_to_executable()
   using namespace std;
   std::string path;
   char buffer[1024];
-  std::uint32_t size = sizeof(buffer);
+  uint32_t size = sizeof(buffer);
 #if defined (WIN32)
   GetModuleFileName(nullptr,buffer,size);
   path = buffer;

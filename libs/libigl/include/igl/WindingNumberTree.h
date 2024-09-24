@@ -14,9 +14,10 @@
 
 namespace igl
 {
-  /// Space partitioning tree for computing winding number hierarchically.
-  ///
-  /// @tparam Point  type for points in space, e.g. Eigen::Vector3d
+  // Space partitioning tree for computing winding number hierarchically.
+  //
+  // Templates:
+  //   Point  type for points in space, e.g. Eigen::Vector3d
   template <
     typename Point,
     typename DerivedV, 
@@ -142,8 +143,8 @@ namespace igl
 #include "triangle_fan.h"
 #include "exterior_edges.h"
 
-#include "PI.h"
-#include "remove_duplicate_vertices.h"
+#include <igl/PI.h>
+#include <igl/remove_duplicate_vertices.h>
 
 #include <iostream>
 #include <limits>
@@ -194,7 +195,7 @@ inline void igl::WindingNumberTree<Point,DerivedV,DerivedF>::set_mesh(
   // Remove any exactly duplicate vertices
   // Q: Can this ever increase the complexity of the boundary?
   // Q: Would we gain even more by remove almost exactly duplicate vertices?
-  Eigen::Matrix<typename MatrixXF::Scalar,Eigen::Dynamic,1> SVI,SVJ;
+  MatrixXF SF,SVI,SVJ;
   igl::remove_duplicate_vertices(_V,_F,0.0,SV,SVI,SVJ,F);
   triangle_fan(igl::exterior_edges(F),cap);
   V = SV;

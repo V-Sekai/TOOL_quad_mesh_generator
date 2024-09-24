@@ -11,8 +11,7 @@
 #include <Eigen/Geometry>
 namespace igl
 {
-  /// Generate a random quaternion via uniform sampling of the 4-sphere
-  /// @return a random quaternion 
+  // Return a random quaternion via uniform sampling of the 4-sphere
   template <typename Scalar>
   IGL_INLINE Eigen::Quaternion<Scalar> random_quaternion();
 }

@@ -8,6 +8,7 @@
 #include "bbw.h"
 #include "mosek_quadprog.h"
 #include "../harmonic.h"
+#include "../slice_into.h"
 #include <Eigen/Sparse>
 #include <iostream>
 #include <cstdio>
@@ -59,8 +60,8 @@ IGL_INLINE bool igl::mosek::bbw(
     VectorXd bci = bc.col(i);
     VectorXd Wi;
     // impose boundary conditions via bounds
-    ux(b) = bci;
-    lx(b) = bci;
+    slice_into(bci,b,ux);
+    slice_into(bci,b,lx);
     bool r = mosek_quadprog(Q,c,0,A,lc,uc,lx,ux,mosek_data,Wi);
     if(!r)
     {

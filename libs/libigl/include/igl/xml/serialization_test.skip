@@ -7,6 +7,7 @@
 //#ifndef IGL_SERIALIZATION_TEST_H
 //#define IGL_SERIALIZATION_TEST_H
 
+//#include <igl/Timer.h>
 #include "serialize_xml.h"
 #include "XMLSerializable.h"
 

@@ -12,8 +12,7 @@
 #include <functional>
 namespace igl
 {
-  /// Templated min heap (reverses sort order of std::priority_queue)
-  /// @tparam T type of elements in heap
+  // Templated min heap (reverses sort order of std::priority_queue)
   template<class T> using min_heap = 
     std::priority_queue< T, std::vector<T >, std::greater<T > >;
 }

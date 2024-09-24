@@ -1,6 +1,7 @@
 #include "polygons_to_triangles.h"
 #include "ear_clipping.h"
 #include "../sort.h"
+#include "../slice.h"
 #include <Eigen/Eigenvalues>
 
 template <
@@ -54,7 +55,7 @@ IGL_INLINE void igl::predicates::polygons_to_triangles(
               Eigen::Vector3d _1;
               Eigen::Vector3i I;
               igl::sort(es.eigenvalues().real().eval(),1,false,_1,I);
-              C = C(Eigen::all,I).eval();
+              igl::slice(Eigen::Matrix3d(C),I,2,C);
             }
             S = P*C.leftCols(2);
             break;
@@ -83,9 +84,10 @@ IGL_INLINE void igl::predicates::polygons_to_triangles(
         // This is a really low quality triangulator and will contain nearly
         // degenerate elements which become degenerate or worse when unprojected
         // back to 3D.
+        igl::predicates::ear_clipping(S,RT,_I,pF,_nS);
         // igl::predicates::ear_clipping does not gracefully fail when the input
         // is not simple. Instead it (tends?) to output too few triangles.
-        if(! igl::predicates::ear_clipping(S,pF) )
+        if(pF.rows() < np-2)
         {
           // Fallback, use a fan
           //std::cout<<igl::matlab_format(S,"S")<<std::endl;

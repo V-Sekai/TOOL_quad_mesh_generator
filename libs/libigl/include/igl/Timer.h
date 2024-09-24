@@ -22,15 +22,13 @@
 #include <sys/time.h>
 #endif
 #include <cstddef>
-#include <cstdint>
 
 namespace igl
 {
-  /// Simple timer class
   class Timer
   {
   public:
-    /// default constructor
+    // default constructor
     Timer():
       stopped(0),
 #ifdef WIN32
@@ -66,13 +64,10 @@ namespace igl
     }
 
 #ifdef __APPLE__
-    /// Raw mach_absolute_times going in, difference in seconds out
-    /// @param[in] endTime   end time
-    /// @param[in] startTime start time
-    /// @return time
-    double subtractTimes( std::uint64_t endTime, std::uint64_t startTime )
+    //Raw mach_absolute_times going in, difference in seconds out
+    double subtractTimes( uint64_t endTime, uint64_t startTime )
     {
-      std::uint64_t difference = endTime - startTime;
+      uint64_t difference = endTime - startTime;
       static double conversion = 0.0;
 
       if( conversion == 0.0 )
@@ -89,7 +84,7 @@ namespace igl
     }
 #endif
 
-    /// start timer
+    // start timer
     void   start()               
     {
       stopped = 0; // reset stop flag
@@ -103,7 +98,7 @@ namespace igl
 
     }
 
-    /// stop the timer
+    // stop the timer
     void   stop()                
     {
       stopped = 1; // set timer stopped flag
@@ -117,27 +112,23 @@ namespace igl
 #endif
 
     }
-    /// get elapsed time in second
-    /// @return time in seconds
+    // get elapsed time in second
     double getElapsedTime()      
     {
       return this->getElapsedTimeInSec();
     }
-    /// get elapsed time in second (same as getElapsedTime)
-    /// @return time
+    // get elapsed time in second (same as getElapsedTime)
     double getElapsedTimeInSec() 
     {
       return this->getElapsedTimeInMicroSec() * 0.000001;
     }
 
-    /// get elapsed time in milli-second
-    /// @return time
+    // get elapsed time in milli-second
     double getElapsedTimeInMilliSec()
     {
       return this->getElapsedTimeInMicroSec() * 0.001;
     }
-    /// get elapsed time in micro-second
-    /// @return time
+    // get elapsed time in micro-second
     double getElapsedTimeInMicroSec()          
     {
       double startTimeInMicroSec = 0;
@@ -176,8 +167,8 @@ namespace igl
     LARGE_INTEGER startCount;     
     LARGE_INTEGER endCount;       
 #elif __APPLE__
-    std::uint64_t startCount;           
-    std::uint64_t endCount;             
+    uint64_t startCount;           
+    uint64_t endCount;             
 #else
     timeval startCount;           
     timeval endCount;             

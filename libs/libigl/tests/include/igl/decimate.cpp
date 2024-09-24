@@ -2,6 +2,8 @@
 #include <igl/decimate.h>
 #include <igl/sort.h>
 #include <igl/sortrows.h>
+#include <igl/normalize_row_lengths.h>
+#include <igl/slice.h>
 #include <igl/matlab_format.h>
 #include <iostream>
 
@@ -24,10 +26,11 @@ TEST_CASE("decimate: hemisphere", "[igl]")
   // Perfect normals from positions
   Eigen::MatrixXd NV = V.rowwise().normalized();
   // Remove half of the faces
-  igl::decimate(V,F,F.rows()/2,false,U,G,J,I);
+  igl::decimate(V,F,F.rows()/2,U,G,J,I);
   // Expect that all normals still point in same direction as original
   Eigen::MatrixXd NU = U.rowwise().normalized();
-  Eigen::MatrixXd NVI = NV(I,Eigen::all);
+  Eigen::MatrixXd NVI;
+  igl::slice(NV,I,1,NVI);
   REQUIRE (NU.rows() == NVI.rows());
   REQUIRE (NU.cols() == NVI.cols());
   // Dot product
@@ -43,19 +46,19 @@ TEST_CASE("decimate: closed", "[igl]")
   {
     Eigen::MatrixXd V,U;
     Eigen::MatrixXi F,G;
-    Eigen::VectorXi I,J;
+    Eigen::VectorXi J;
     // Load example mesh: GetParam() will be name of mesh file
     igl::read_triangle_mesh(test_common::data_path(param), V, F);
-    igl::decimate(V,F,0,false,U,G,I,J);
+    igl::decimate(V,F,0,U,G,J);
     REQUIRE (4 == U.rows());
     REQUIRE (4 == G.rows());
     {
-      Eigen::MatrixXi _;
-      igl::sort(Eigen::MatrixXi(G),2,true,G,_);
+      Eigen::MatrixXi I;
+      igl::sort(Eigen::MatrixXi(G),2,true,G,I);
     }
     {
-      Eigen::VectorXi _;
-      igl::sortrows(Eigen::MatrixXi(G),true,G,_);
+      Eigen::VectorXi I;
+      igl::sortrows(Eigen::MatrixXi(G),true,G,I);
     }
     // Tet with sorted faces
     Eigen::MatrixXi T(4,3);
