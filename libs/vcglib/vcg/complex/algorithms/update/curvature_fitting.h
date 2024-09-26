@@ -621,7 +621,6 @@ class Quadric
 
     static void updateCurvatureLocal (MeshType & mesh, float radiusSphere, vcg::CallBackPos * cb = NULL)
     {
-	vcg::tri::UpdateFlags<MeshType>::FaceClear(mesh, FaceType::VISITED);
     bool projectionPlaneCheck = true;
     int vertexesPerFit = 0;
 

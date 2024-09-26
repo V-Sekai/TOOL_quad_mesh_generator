@@ -5,8 +5,8 @@
 ;
 [subrepo]
 	remote = https://github.com/cnr-isti-vclab/vcglib.git
-	branch = main
-	commit = 88c881d8393929c8e09b9df765ce8582bf386499
-	parent = 4109c1ab3862b14eb8ff969064ab96324dd8df82
+	branch = 8fd06e57cf10632ddcb84ad6aee65bcca55e0560
+	commit = 8fd06e57cf10632ddcb84ad6aee65bcca55e0560
+	parent = 54bb5a7098737384408562e0f876036fed62e1fb
 	method = merge
-	cmdver = 0.4.6
+	cmdver = 0.4.9

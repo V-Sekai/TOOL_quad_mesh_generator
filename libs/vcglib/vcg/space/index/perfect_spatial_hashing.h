@@ -24,6 +24,8 @@
 #ifndef VCG_SPACE_INDEX_PERFECT_SPATIAL_HASHING_H
 #define VCG_SPACE_INDEX_PERFECT_SPATIAL_HASHING_H
 
+#pragma warning(disable : 4996)
+
 #define _USE_GRID_UTIL_PARTIONING_ 1
 #define _USE_OCTREE_PARTITIONING_  (1-_USE_GRID_UTIL_PARTIONING_)
 
@@ -1141,8 +1143,7 @@ namespace vcg
             vcg::Point3i resolution;
             vcg::BestDim<ScalarType>(number_of_objects, resulting_bb.Dim(), resolution);
             int cells_per_side = resolution.X();
-//  _USE_OCTREE_PARTITIONING_ // Alternative to find the resolution of the uniform grid:
-#else
+#else ifdef _USE_OCTREE_PARTITIONING_ // Alternative to find the resolution of the uniform grid:
             int primitives_per_voxel;
             int depth = 4;
             do

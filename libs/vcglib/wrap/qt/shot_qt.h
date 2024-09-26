@@ -35,15 +35,12 @@ template <class ShotType>
       shot.Extrinsics.SetRot(rot);
 
       vcg::Camera<ScalarType> &cam = shot.Intrinsics;
-      if (attr.contains("CameraType")) {
-          int tmp = attr.namedItem("CameraType").nodeValue().toInt();
-          cam.cameraType = static_cast<typename vcg::Camera<ScalarType>::CameraType>(tmp);
-      }
+      if (attr.contains("CameraType")) cam.cameraType = attr.namedItem("CameraType").nodeValue().toInt();
       memcpy(&cam.FocalMm, QByteArray::fromBase64(attr.namedItem("FocalMm").nodeValue().toLocal8Bit()).data(), sizeof(ScalarType));
       memcpy(&cam.ViewportPx, QByteArray::fromBase64(attr.namedItem("ViewportPx").nodeValue().toLocal8Bit()).data(), sizeof(int) * 2);
       memcpy(&cam.CenterPx, QByteArray::fromBase64(attr.namedItem("CenterPx").nodeValue().toLocal8Bit()).data(), sizeof(ScalarType)*2);
       memcpy(&cam.PixelSizeMm, QByteArray::fromBase64(attr.namedItem("PixelSizeMm").nodeValue().toLocal8Bit()).data(), sizeof(ScalarType) * 2);
-      memcpy(&cam.k[0], QByteArray::fromBase64(attr.namedItem("LensDistortion").nodeValue().toLocal8Bit()).data(), sizeof(ScalarType) * 2);
+      memcpy(&cam.k, QByteArray::fromBase64(attr.namedItem("LensDistortion").nodeValue().toLocal8Bit()).data(), sizeof(ScalarType) * 2);
     }
     else
     {
@@ -61,10 +58,7 @@ template <class ShotType>
       shot.Extrinsics.SetRot(rot);
 
       vcg::Camera<ScalarType> &cam = shot.Intrinsics;
-      if (attr.contains("CameraType")) {
-          int tmp = attr.namedItem("CameraType").nodeValue().toInt();
-          cam.cameraType = static_cast<typename vcg::Camera<ScalarType>::CameraType>(tmp);
-      }
+      if (attr.contains("CameraType")) cam.cameraType = attr.namedItem("CameraType").nodeValue().toInt();
       cam.FocalMm = attr.namedItem("FocalMm").nodeValue().toDouble();
       cam.ViewportPx.X() = attr.namedItem("ViewportPx").nodeValue().section(' ', 0, 0).toInt();
       cam.ViewportPx.Y() = attr.namedItem("ViewportPx").nodeValue().section(' ', 1, 1).toInt();
@@ -203,7 +197,7 @@ QDomElement WriteShotToQDomNodeBinary(
   value = QByteArray::fromRawData((char *)&cam.FocalMm, sizeof(ScalarType)).toBase64();
   shotElem.setAttribute("FocalMm", QString(value));
 
-  value = QByteArray::fromRawData((char *)&cam.k[0], sizeof(ScalarType) * 2).toBase64();
+  value = QByteArray::fromRawData((char *)&cam.k, sizeof(ScalarType) * 2).toBase64();
   shotElem.setAttribute("LensDistortion", QString(value));
 
   value = QByteArray::fromRawData((char *)&cam.PixelSizeMm, sizeof(ScalarType) * 2).toBase64();

@@ -419,8 +419,8 @@ public:
             // verifying validity of vertex indices
             std::vector<int> tmp = ff.v;
             std::sort(tmp.begin(),tmp.end());
-            auto it = std::unique(tmp.begin(), tmp.end()); // returns the new end of the vector with unique indices
-            if(it != tmp.end()) { // if the end is changed, there were duplicated indices...
+            std::unique(tmp.begin(),tmp.end());
+            if(tmp.size() != ff.v.size()) {
               result = E_VERTICES_WITH_SAME_IDX_IN_FACE;
               extraTriangles--;
               continue;
@@ -624,7 +624,7 @@ public:
               unsigned char r			= (unsigned char) (diffuseColor[0] * 255.0);
               unsigned char g			= (unsigned char) (diffuseColor[1] * 255.0);
               unsigned char b			= (unsigned char) (diffuseColor[2] * 255.0);
-			  unsigned char alpha = (unsigned char) ((1 - material.Tr)  * 255.0);
+              unsigned char alpha = (unsigned char) (material.Tr  * 255.0);
               currentColor= Color4b(r, g, b, alpha);
               found = true;
             }
@@ -641,8 +641,6 @@ public:
       } // end for each line...
     } // end while stream not eof
     assert((numTriangles +numVertices) == numVerticesPlusFaces+extraTriangles);
-    (void)extraTriangles;
-    (void)numTexCoords;
     vcg::tri::Allocator<OpenMeshType>::AddFaces(m,numTriangles);
     
     // Add found edges
@@ -986,7 +984,7 @@ public:
 		currentMaterial.Ka = Point3f(0.2, 0.2, 0.2);
 		currentMaterial.Kd = Point3f(1, 1, 1);
 		currentMaterial.Ks = Point3f(1, 1, 1);
-		currentMaterial.Tr = 0;
+		currentMaterial.Tr = 1;
 		currentMaterial.Ns = 0;
 		currentMaterial.illum = 2;
 
@@ -1030,12 +1028,7 @@ public:
 						currentMaterial.Ks = Point3fFrom3Tokens(tokens,1);
 					}
 				}
-				else if (header.compare("d")==0) { // alpha
-					if (tokens.size() < 2) {
-						currentMaterial.Tr = 1 - (float) atof(tokens[1].c_str());
-					}
-				}
-				else if (header.compare("Tr")==0) { // alpha
+				else if ((header.compare("d")==0) || (header.compare("Tr")==0)) { // alpha
 					if (tokens.size() < 2) {
 						currentMaterial.Tr = (float) atof(tokens[1].c_str());
 					}

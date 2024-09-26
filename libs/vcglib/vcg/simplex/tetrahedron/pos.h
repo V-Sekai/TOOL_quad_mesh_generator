@@ -385,7 +385,7 @@ public:
     void Assert()
 #ifdef _DEBUG
     {
-        auto ht=*this;
+        HETYPE ht=*this;
         ht.FlipT();
         ht.FlipT();
         assert(ht==*this);

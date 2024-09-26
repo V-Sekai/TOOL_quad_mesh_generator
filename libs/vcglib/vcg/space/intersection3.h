@@ -283,11 +283,8 @@ namespace vcg {
       typedef typename TRIANGLETYPE::ScalarType T;
       if(IntersectionPlaneSegment(pl,Segment3<T>(tr.cP(0),tr.cP(1)),sg.P0()))
       {
-        if(IntersectionPlaneSegment(pl,Segment3<T>(tr.cP(2),tr.cP(0)),sg.P1()))
-        {
-          std::swap(sg.P0(),sg.P1());
+        if(IntersectionPlaneSegment(pl,Segment3<T>(tr.cP(0),tr.cP(2)),sg.P1()))
           return true;
-        }          
         else
         {
           if(IntersectionPlaneSegment(pl,Segment3<T>(tr.cP(1),tr.cP(2)),sg.P1()))
@@ -300,8 +297,7 @@ namespace vcg {
       {
         if(IntersectionPlaneSegment(pl,Segment3<T>(tr.cP(1),tr.cP(2)),sg.P0()))
         {
-          if(IntersectionPlaneSegment(pl,Segment3<T>(tr.cP(2),tr.cP(0)),sg.P1()))
-            return true;
+          if(IntersectionPlaneSegment(pl,Segment3<T>(tr.cP(0),tr.cP(2)),sg.P1()))return true;
           assert(0);
           return true;
         }
@@ -418,33 +414,17 @@ bool IntersectionLineTriangle( const Line3<T> & line, const Point3<T> & vert0,
    return 1;
 }
 
-/**
-     Computes the intersection between a Ray and a Triangle. Returns the hitDistance and the baricentric coordinates of the hit point.
-
-     bar3 = (1 - bar1 - bar2)
-     hitPoint = ray.origin + hitDistance * ray.direction = bar3 * vert0 + bar1 * vert1 + bar2 * vert2
-*/
-template<class ScalarType>
-bool IntersectionRayTriangle(
-    const Ray3<ScalarType>& ray,
-    const Point3<ScalarType>& vert0,
-    const Point3<ScalarType>& vert1,
-    const Point3<ScalarType>& vert2,
-    ScalarType& hitDistance,
-    ScalarType& bar1,
-    ScalarType& bar2)
+template<class T>
+bool IntersectionRayTriangle( const Ray3<T> & ray, const Point3<T> & vert0,
+                  const Point3<T> & vert1, const Point3<T> & vert2,
+                  T & t ,T & u, T & v)
 {
-    Line3<ScalarType> line(ray.Origin(), ray.Direction());
-    ScalarType new_hitDistance = hitDistance, new_bar1 = bar1, new_bar2 = bar2;
-    if ( IntersectionLineTriangle(line, vert0, vert1, vert2, new_hitDistance, new_bar1, new_bar2) ) {
-        if (new_hitDistance < 0) return false;
-        else {
-            hitDistance = new_hitDistance; bar1 = new_bar1; bar2 = new_bar2;
-            return true;
-        }
-    } else {
-        return false;
-    }
+    Line3<T> line(ray.Origin(), ray.Direction());
+    if (IntersectionLineTriangle(line, vert0, vert1, vert2, t, u, v))
+    {
+        if (t < 0) return 0;
+        else return 1;
+    }else return 0;
 }
 
 // line-box

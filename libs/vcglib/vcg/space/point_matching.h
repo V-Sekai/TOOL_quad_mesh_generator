@@ -95,10 +95,9 @@ void ComputeRigidMatchMatrix(std::vector<Point3<S> > &Pfix,
   Point3<S> bfix,bmov; // baricenter of src e trg
 
   ComputeCrossCovarianceMatrix(Pmov,bmov,Pfix,bfix,ccm);
-  const Eigen::Matrix3d ccmt =ccm.transpose(); // the transpose of the cross covariance matrix.
 
   Eigen::Matrix3d cyc; // the cyclic components of the cross covariance matrix.
-  cyc=ccm-ccmt;
+  cyc=ccm-ccm.transpose();
 
   Eigen::Matrix4d  QQ;
   QQ.setZero();
@@ -109,7 +108,7 @@ void ComputeRigidMatchMatrix(std::vector<Point3<S> > &Pfix,
   RM(0,0)=-ccm.trace();
   RM(1,1)=-ccm.trace();
   RM(2,2)=-ccm.trace();
-  RM += ccm + ccmt;
+  RM += ccm + ccm.transpose();
 
   QQ(0,0) = ccm.trace();
   QQ.block<1,3> (0,1) = D.transpose();

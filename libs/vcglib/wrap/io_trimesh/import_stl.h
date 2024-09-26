@@ -174,9 +174,8 @@ static bool IsSTLMalformed(const char * filename, bool &binaryFlag)
   // second check, sometimes the size is a bit wrong, 
   // lets'make a test to check that we find only ascii stuff before assuming it is ascii
   unsigned char tmpbuf[1000];
-  std::size_t byte_to_read = std::min(sizeof(tmpbuf), (size_t)file_size - 80 - sizeof(unsigned int));
-  ret = fread(tmpbuf, byte_to_read,1,fp);
-  if (ret != 1) return false;
+  std::size_t byte_to_read = std::min(sizeof(tmpbuf), (size_t)file_size - 80);
+  fread(tmpbuf, byte_to_read,1,fp);
   fclose(fp);
   for(std::size_t i = 0; i < byte_to_read; i++)
     {
@@ -320,7 +319,6 @@ static int OpenBinary( OpenMeshType &m, const char * filename, int &loadMask, Ca
       }
     }
     fclose(fp);
-    (void)lineCnt;
     return E_NOERROR;
   }
 }; // end class

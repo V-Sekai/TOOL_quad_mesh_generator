@@ -429,14 +429,6 @@ void Sphere(MeshType &in, const int subdiv = 3 )
     }
 }
 
-template <class MeshType>
-void Sphere(MeshType & m, const typename MeshType::CoordType & position,  typename MeshType::ScalarType radius = 0, const int subdiv = 3)
-{
-	m.Clear();
-	tri::Sphere(m, subdiv);
-	tri::UpdatePosition<MeshType>::Scale(m,radius);
-	tri::UpdatePosition<MeshType>::Translate(m, position);
-}
 
     /// r1 = raggio 1, r2 = raggio2, h = altezza (asse y)
 template <class MeshType>
@@ -1215,26 +1207,14 @@ template <class MeshType>
 void BuildCylinderEdgeShell(MeshType &mIn, MeshType &mOut, float radius=0, int slices=16, int stacks=1 )
 {
   if(radius==0) radius = mIn.bbox.Diag()/100.0f;
-  if (mIn.edge.size() > 0)
+  typedef typename tri::UpdateTopology<MeshType>::PEdge PEdge;
+  std::vector<PEdge> edgeVec;
+  tri::UpdateTopology<MeshType>::FillUniqueEdgeVector(mIn,edgeVec,false);
+  for(size_t i=0;i<edgeVec.size();++i)
   {
-	  for (size_t i = 0; i < mIn.edge.size(); ++i) {
-		  MeshType mCyl;
-		  tri::OrientedCylinder(
-			  mCyl, mIn.edge[i].V(0)->P(), mIn.edge[i].V(1)->P(), radius, true, slices, stacks);
-		  tri::Append<MeshType, MeshType>::Mesh(mOut, mCyl);
-	  }
-  }
-  else
-  {
-	  typedef typename tri::UpdateTopology<MeshType>::PEdge PEdge;
-	  std::vector<PEdge>                                    edgeVec;
-	  tri::UpdateTopology<MeshType>::FillUniqueEdgeVector(mIn, edgeVec, false);
-	  for (size_t i = 0; i < edgeVec.size(); ++i) {
-		  MeshType mCyl;
-		  tri::OrientedCylinder(
-			  mCyl, edgeVec[i].v[0]->P(), edgeVec[i].v[1]->P(), radius, true, slices, stacks);
-		  tri::Append<MeshType, MeshType>::Mesh(mOut, mCyl);
-	  }
+    MeshType mCyl;
+    tri::OrientedCylinder(mCyl,edgeVec[i].v[0]->P(),edgeVec[i].v[1]->P(),radius,true,slices,stacks);
+    tri::Append<MeshType,MeshType>::Mesh(mOut,mCyl);
   }
 }
 

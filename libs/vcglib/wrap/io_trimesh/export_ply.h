@@ -752,7 +752,6 @@ public:
 									fwrite(&thp3df[i][fp][0], sizeof(double), 1,fpout);
 									fwrite(&thp3df[i][fp][1], sizeof(double), 1,fpout);
 									fwrite(&thp3df[i][fp][2], sizeof(double), 1,fpout);
-									break;
 								default : assert(0);
 								}
 							}
@@ -872,7 +871,6 @@ public:
 			}
 		}
 		assert(fcnt==m.fn);
-		(void)fcnt;
 		int eauxvv[2];
 		if( pi.mask & Mask::IOM_EDGEINDEX )
 		{
@@ -893,7 +891,6 @@ public:
 				}
 			}
 			assert(ecnt==m.en);
-			(void)ecnt;
 		}
 		int result = 0;
 		if (ferror(fpout)) result = ply::E_STREAMERROR;

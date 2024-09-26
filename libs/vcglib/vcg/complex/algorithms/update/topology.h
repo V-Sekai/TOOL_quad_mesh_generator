@@ -141,7 +141,7 @@ static void FillUniqueFaceVector (MeshType & m, std::vector<PFace> & fvec)
   typename std::vector<PFace>::iterator newEnd = std::unique(fvec.begin(), fvec.end());
 }
 
-/// \brief Auxiliary data structure for computing face face adjacency information.
+/// \brief Auxiliairy data structure for computing face face adjacency information.
 /**
 It identifies and edge storing two vertex pointer and a face pointer where it belong.
 */
@@ -182,7 +182,7 @@ public:
   {
     return v[0]==pe.v[0] && v[1]==pe.v[1];
   }
-  /// Convert from edge barycentric coord to the face barycentric coord a point on the current edge.
+  /// Convert from edge barycentric coord to the face baricentric coord a point on the current edge.
   /// Face barycentric coordinates are relative to the edge face.
   inline Point3<ScalarType> EdgeBarycentricToFaceBarycentric(ScalarType u) const
   {
@@ -345,6 +345,7 @@ static void TetraTetra (MeshType & m)
   FillFaceVector(m, fvec);
   std::sort(fvec.begin(), fvec.end());
 
+  int nf = 0;
   typename std::vector<PFace>::iterator pback, pfront;
   pback  = fvec.begin();
   pfront = fvec.begin();
@@ -368,6 +369,7 @@ static void TetraTetra (MeshType & m)
       (*q).t->TTp(q->z) = pback->t;
       (*q).t->TTi(q->z) = pback->z;
       pback = pfront;
+      ++nf;
     }
     if (pfront == fvec.end()) break;
     ++pfront;
@@ -396,21 +398,22 @@ static void FaceFace(MeshType &m)
 {
   RequireFFAdjacency(m);
   if( m.fn == 0 ) return;
-  // we use an auxiliary vector of pairs (face,edge index) to sort the edges
+
   std::vector<PEdge> e;
   FillEdgeVector(m,e);
-  sort(e.begin(), e.end());	
+  sort(e.begin(), e.end());							// Lo ordino per vertici
 
-  auto ps = e.begin();
-  auto pe = e.begin();
-  // scans the sorted vector of edges searching for edges with the same pair of vertices
-  // and connect the corresponding faces
+  int ne = 0;											// Numero di edge reali
+
+  typename std::vector<PEdge>::iterator pe,ps;
+  ps = e.begin();pe=e.begin();
+  //for(ps = e.begin(),pe=e.begin();pe<=e.end();++pe)	// Scansione vettore ausiliario
   do
   {
-    if( pe==e.end() || !(*pe == *ps) )
+    if( pe==e.end() || !(*pe == *ps) )					// Trovo blocco di edge uguali
     {
       typename std::vector<PEdge>::iterator q,q_next;
-      for (q=ps;q<pe-1;++q)						
+      for (q=ps;q<pe-1;++q)						// Scansione facce associate
       {
         assert((*q).z>=0);
         //assert((*q).z< 3);
@@ -418,7 +421,7 @@ static void FaceFace(MeshType &m)
         ++q_next;
         assert((*q_next).z>=0);
         assert((*q_next).z< (*q_next).f->VN());
-        (*q).f->FFp(q->z) = (*q_next).f;				
+        (*q).f->FFp(q->z) = (*q_next).f;				// Collegamento in lista delle facce
         (*q).f->FFi(q->z) = (*q_next).z;
       }
       assert((*q).z>=0);
@@ -426,6 +429,7 @@ static void FaceFace(MeshType &m)
       (*q).f->FFp((*q).z) = ps->f;
       (*q).f->FFi((*q).z) = ps->z;
       ps = pe;
+      ++ne;										// Aggiorno il numero di edge
     }
     if(pe==e.end()) break;
     ++pe;
@@ -608,8 +612,7 @@ static void TestVertexEdge(MeshType &m)
         for(edge::VEIterator<EdgeType> vei(&*vi);!vei.End();++vei)
           cnt++;
         assert((numVertex[tri::Index(m,*vi)] == 0) == (vi->VEp()==0) );
-        assert(cnt==numVertex[tri::Index(m,*vi)]);
-        (void)cnt;
+        assert(cnt==numVertex[tri::Index(m,*vi)]);        
       }
   }  
 }
@@ -651,7 +654,6 @@ static void TestVertexFace(MeshType &m)
                 ++VFi;
             }
             assert(num==numVertex[&(*vi)]);
-            (void)num;
         }
     }
 }
@@ -723,23 +725,30 @@ static void EdgeEdge(MeshType &m)
   std::vector<PVertexEdge> v;
   if( m.en == 0 ) return;
 
-  for(EdgeIterator pf=m.edge.begin(); pf!=m.edge.end(); ++pf)
+//  printf("Inserting Edges\n");
+  for(EdgeIterator pf=m.edge.begin(); pf!=m.edge.end(); ++pf)			// Lo riempio con i dati delle facce
     if( ! (*pf).IsD() )
       for(int j=0;j<2;++j)
       {
+//        printf("egde %i ind %i (%i %i)\n",tri::Index(m,&*pf),j,tri::Index(m,pf->V(0)),tri::Index(m,pf->V(1)));
         v.push_back(PVertexEdge(&*pf,j));
       }
 
-  sort(v.begin(), v.end());							
+//  printf("en = %i (%i)\n",m.en,m.edge.size());
+  sort(v.begin(), v.end());							// Lo ordino per vertici
 
-  auto ps = v.begin();
-  auto pe = v.begin();
+  int ne = 0;											// Numero di edge reali
+
+  typename std::vector<PVertexEdge>::iterator pe,ps;
+  // for(ps = v.begin(),pe=v.begin();pe<=v.end();++pe)	// Scansione vettore ausiliario
+  ps = v.begin();pe=v.begin();
   do
   {
-    if( pe==v.end() || !(*pe == *ps) )					// search for blocs of edges with the same vertex
+//    printf("v %i -> e %i\n",tri::Index(m,(*ps).v),tri::Index(m,(*ps).e));
+    if( pe==v.end() || !(*pe == *ps) )					// Trovo blocco di edge uguali
     {
       typename std::vector<PVertexEdge>::iterator q,q_next;
-      for (q=ps;q<pe-1;++q)					
+      for (q=ps;q<pe-1;++q)						// Scansione edge associati
       {
         assert((*q).z>=0);
         assert((*q).z< 2);
@@ -747,7 +756,7 @@ static void EdgeEdge(MeshType &m)
         ++q_next;
         assert((*q_next).z>=0);
         assert((*q_next).z< 2);
-        (*q).e->EEp(q->z) = (*q_next).e;	
+        (*q).e->EEp(q->z) = (*q_next).e;				// Collegamento in lista delle facce
         (*q).e->EEi(q->z) = (*q_next).z;
       }
       assert((*q).z>=0);
@@ -755,6 +764,7 @@ static void EdgeEdge(MeshType &m)
       (*q).e->EEp((*q).z) = ps->e;
       (*q).e->EEi((*q).z) = ps->z;
       ps = pe;
+      ++ne;										// Aggiorno il numero di edge
     }
     if(pe==v.end()) break;
     ++pe;
@@ -786,8 +796,8 @@ static void VertexEdge(MeshType &m)
 
 }; // end class
 
-}	// End namespace 
-}	// End namespace 
+}	// End namespace
+}	// End namespace
 
 
 #endif

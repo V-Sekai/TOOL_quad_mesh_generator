@@ -243,6 +243,8 @@ namespace vcg {
 					if (curResult->isValid()) {
 						hasValidAlign                = true;
 						std::pair<double, double> dd = curResult->computeAvgErr();
+#pragma omp critical
+
 						buf.fill('\0');
 						std::snprintf(
 							buf.data(),
@@ -254,10 +256,10 @@ namespace vcg {
 							OG.SVA[i].t,
 							dd.first,
 							dd.second);
-#pragma omp critical
 						cb(0, buf.data());
 					}
 					else {
+#pragma omp critical
 						buf.fill('\0');
 						std::snprintf(
 							buf.data(),
@@ -268,7 +270,6 @@ namespace vcg {
 							OG.SVA[i].s,
 							OG.SVA[i].t,
 							vcg::AlignPair::errorMsg(curResult->status));
-#pragma omp critical
 						cb(0, buf.data());
 					}
 				}
