@@ -5,7 +5,7 @@ clean:
     rm -rf blender_monkey_*
 
 build:
-    cmake . -B build -DWITH_GUROBI=0 -DSATSUMA_ENABLE_BLOSSOM5=1
+    cmake . -B build -DWITH_GUROBI=0 -DSATSUMA_ENABLE_BLOSSOM5=0
     cmake --build build --parallel
 
 run:
