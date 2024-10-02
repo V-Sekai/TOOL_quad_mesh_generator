@@ -23,7 +23,7 @@ set(BUILD_SHARED_LIBS OFF) # static libs make distribution easier
 if(WIN32)
     add_definitions(/D_USE_MATH_DEFINES /DNOMINMAX)
     #vcglib has some broken debug code enabled with _DEBUG
-    #add_compile_options(/U_DEBUG)
+    add_compile_options(-U_DEBUG)
     # XXX: hacky workaround, seems i cannot undefine _DEBUG even in a release build?!
     add_definitions(/DHETYPE=auto)
     set(CMAKE_MSVC_RUNTIME_LIBRARY MultiThreaded)

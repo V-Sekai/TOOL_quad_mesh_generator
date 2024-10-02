@@ -46,3 +46,4 @@ CMakeLists.txt.user
 /.vs
 
 blender_monkey_*
+output_with_boundary_*
